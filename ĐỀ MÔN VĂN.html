@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHỦ ĐỀ TIẾNG VIỆT</title>
+    <script>
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f0f2f5; line-height: 1.6; }
+        h1 { text-align: center; color: #1a237e; }
+        .section-header { color: #e67e22; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 40px; margin-bottom: 20px; }
+        .question-box { background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; white-space: pre-wrap; }
+        
+        /* Ẩn input radio mặc định */
+        input[type="radio"] { display: none; }
+        
+        /* Trắc nghiệm Format Mới */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .option-label { display: flex; align-items: center; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #fafafa; }
+        .option-label:hover { background: #f1f2f6; }
+        
+        .opt-letter { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 50%; background-color: white; color: #3498db; border: 2px solid #3498db; box-sizing: border-box; font-weight: bold; margin-right: 12px; font-size: 15px; transition: 0.2s; }
+		input[type="radio"]:checked + .opt-letter { background-color: #3498db; color: white; box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2); }
+        .option-label.correct { border-color: #2ecc71; background: #d5f5e3; }
+        .option-label.correct .opt-letter { background-color: #27ae60; }
+        .option-label.wrong { border-color: #e74c3c; background: #fadbd8; }
+        .option-label.wrong .opt-letter { background-color: #e74c3c; }
+        
+        /* Đúng Sai Format Mới */
+        .tf-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .tf-table th, .tf-table td { border: 1px solid #dcdde1; padding: 12px; }
+        .tf-table th { background: #f8f9f9; text-align: center; }
+        .tf-cell-center { text-align: center; }
+        
+        .opt-letter-tf { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; border-radius: 4px; background-color: #34495e; color: white; font-weight: bold; margin-right: 10px; font-size: 14px; }
+        .tf-radio-label { display: block; cursor: pointer; }
+        .tf-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background-color: #ecf0f1; font-weight: bold; color: #7f8c8d; transition: 0.2s; }
+        
+        input[type="radio"][value="Đ"]:checked + .tf-btn { background-color: #2ecc71; color: white; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3); }
+        input[type="radio"][value="S"]:checked + .tf-btn { background-color: #e74c3c; color: white; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3); }
+        .tf-correct .tf-btn { background-color: #27ae60 !important; color: white !important; }
+        .tf-wrong .tf-btn { background-color: #c0392b !important; color: white !important; }
+
+        /* Trả lời ngắn */
+        .sa-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
+        .sa-input:focus { border-color: #3498db; outline: none; }
+        
+        .actions { margin-top: 15px; display: flex; gap: 10px; }
+        button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-check { background: #3498db; }
+        .btn-key { background: #9b59b6; display: none; }
+        .btn-submit-section { background: #e74c3c; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; border-radius: 8px; }
+        .feedback { margin-top: 10px; font-weight: bold; }
+        .explanation-box { display: none; margin-top: 15px; padding: 15px; background: #f8f9f9; border-left: 4px solid #f1c40f; border-radius: 4px; }
+        
+        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; width: 320px; text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px;}
+        .login-box button { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 5px; font-size: 16px;}
+		
+		/* Hiệu ứng RGB cho tên Học sinh */
+        .rgb-wrapper { text-align: center; display: none; margin-bottom: 20px; }
+        .rgb-box {
+            position: relative; padding: 12px 30px; background: #fff;
+            border-radius: 8px; display: inline-block; font-size: 18px;
+            font-weight: bold; color: #1a237e; text-transform: uppercase;
+        }
+        .rgb-box::before {
+            content: ""; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%; border-radius: 12px; z-index: -1;
+            animation: rgb-border 10s linear infinite;
+        }
+        @keyframes rgb-border {
+            0% { background-position: 0 0; } 50% { background-position: 400% 0; } 100% { background-position: 0 0; }
+        }
+
+        /* Nút Tải bài đã chấm */
+        #btn-download-html {
+            position: fixed; bottom: 20px; right: 20px; background: #34495e; color: white;
+            padding: 15px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none; z-index: 999; font-size: 16px; border: 2px solid #ecf0f1; transition: 0.3s;
+        }
+        #btn-download-html:hover { background: #2c3e50; transform: scale(1.05); }
+	
+	
+	</style>
+</head>
+<body>
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>Đăng Nhập Làm Bài</h2>
+            <input type="text" id="hs-id" placeholder="Mã học sinh (ID)">
+            <input type="password" id="hs-pass" placeholder="Mật khẩu">
+            <button id="btnLogin" onclick="handleLogin()">ĐĂNG NHẬP</button>
+            <div id="login-msg" style="color: #e74c3c; margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <h1>CHỦ ĐỀ TIẾNG VIỆT</h1>
+	<!-- KHUNG HIỂN THỊ TÊN HỌC SINH -->
+    <div class="rgb-wrapper" id="student-info-container">
+        <div class="rgb-box" id="student-name-display"></div>
+    </div>
+    <div id="quizContainer"></div>
+	<!-- NÚT TẢI BÀI -->
+    <button id="btn-download-html" onclick="downloadGradedHTML()">📥 TẢI BÀI ĐÃ CHẤM</button>
+
+    <script>
+        const quizData = [{"title":"DA DẠNG 1.2: NGHĨA CỦA TỪ (GIẢI NGHĨA, SO SÁNH)","questions":[{"qType":"1","qText":"Câu 1. [EMPIRE TEAM] Tìm từ đồng nghĩa với “tâm lũi” trong câu sau:\n“Cậu bé chỉ lủi thủi một mình mà không có bạn bè chơi cùng.”","image":null,"options":{"A":"Lủi thủi","B":"Cô độc","C":"Lặng lẽ","D":"lẻ loi"},"correct":"A","explanation":"Lời Giải:<br>Chọn A"},{"qType":"1","qText":"Câu 2. [EMPIRE TEAM] Tìm từ đồng nghĩa với “chơi vơi” trong câu thơ sau:\n“Mặt trăng chơi vơi trên nền trời không mây gợn.”\n(Sưu tầm)","image":null,"options":{"A":"Bơ vơ","B":"Hoang mang","C":"Chơ vơ","D":"Lo sợ"},"correct":"C","explanation":"Lời Giải:<br>Chọn C"},{"qType":"1","qText":"Câu 3. [EMPIRE TEAM] Tìm từ đồng nghĩa với “bẽ bàng” trong câu thơ sau:\n“Rượu nhạt uống say lòng càng thêm sầu\nĐường khuya bẽ bàng, bước chân hoang”\n(Sưu tầm)","image":null,"options":{"A":"Xấu hổ","B":"Nhục nhã","C":"Tủi hổ","D":"Ngượng ngùng"},"correct":"C","explanation":"Lời Giải:<br>-Xấu hổ: Chỉ cảm giác ngại ngùng, e thẹn khi làm điều sai hoặc không đúng với chuẩn mực xã hội.<br>-Nhục nhã: Diễn tả sự sỉ nhục, mất danh dự, bị người khác khinh bỉ.<br>-Tủi hổ: Từ này diễn tả được sự xấu hổ, nhục nhã kèm theo nỗi đau xót xa, phù hợp với tâm trạng của nhân vật trữ tình.<br>-Ngượng ngùng: Chỉ cảm giác ngại ngùng, lúng túng khi gặp phải tình huống khó xử.<br>Chọn C"},{"qType":"1","qText":"Câu 4. [EMPIRE TEAM] Trong câu thơ “Tiếng suối trong như tiếng hát xa,” từ “trong” được sử dụng theo nghĩa nào?","image":null,"options":{"A":"Trong veo, không vẩn đục","B":"Rõ ràng, dễ nghe","C":"Yên tĩnh, không ồn ào","D":"Cô độc"},"correct":"B","explanation":"Lời Giải:<br>B. Rõ ràng, dễ nghe: Từ “trong” ở đây miêu tả âm thanh của tiếng suối rất rõ ràng, trong trẻo, vang vọng và dễ nghe, như một giọng hát ở đằng xa.<br>A. Trong veo, không vẩn đục: Thường dùng để miêu tả nước hoặc chất lỏng. <br>C. Yên tĩnh, không ồn ào: Không liên quan đến miêu tả âm thanh.<br>D. Cô độc: Không liên quan đến miêu tả âm thanh hay tiếng suối.<br>Chọn B"},{"qType":"1","qText":"Câu 5: [EMPIRE TEAM] Từ “hồi hộp” trong câu “Tôi cảm thấy hồi hộp trước buổi thuyết trình” có nghĩa gần nhất với từ nào?","image":null,"options":{"A":"Lo lắng","B":"Bồn chồn","C":"Run rẩy","D":"Sợ hãi"},"correct":"A","explanation":"Lời Giải:<br>A. Lo lắng: Cả hai từ đều diễn tả tâm trạng bất an, không yên tâm trước một sự kiện sắp diễn ra.<br>B. Bồn chồn: Diễn tả sự không yên, muốn hoạt động, không thể ngồi yên một chỗ.<br>C. Run rẩy: Mô tả trạng thái cơ thể rung lên vì lạnh, sợ hãi hoặc xúc động mạnh.<br>D. Sợ hãi: Thể hiện nỗi sợ mạnh mẽ trước một mối nguy hiểm hoặc điều gì đó đáng sợ.<br>Chọn A"},{"qType":"1","qText":"Câu 6: [EMPIRE TEAM] Từ \"ngẩn ngơ\" trong câu \"Cô bé ngẩn ngơ nhìn những bông hoa\" có thể được hiểu là gì?","image":null,"options":{"A":"Ngây thơ, hồn nhiên","B":"Mơ màng, không tập trung","C":"Lơ đãng, không để ý","D":"Bối rối, không biết làm gì"},"correct":"B","explanation":"Lời Giải:<br>B. Mơ màng, không tập trung: Từ \"ngẩn ngơ\" diễn tả trạng thái tâm trí không tập trung vào thực tại, như đang đắm chìm vào suy nghĩ hoặc cảm xúc riêng. Cô bé có thể đang bị cuốn hút bởi vẻ đẹp của những bông hoa đến mức không để ý đến những thứ xung quanh.<br>A. Ngây thơ, hồn nhiên: Không liên quan đến việc mất tập trung.<br>C. Lơ đãng, không để ý: Chỉ sự không chú ý đến điều gì đó, trong khi \"ngẩn ngơ\" nhấn mạnh sự đắm chìm trong suy nghĩ riêng.<br>D. Bối rối, không biết làm gì: Không liên quan đến việc bị thu hút bởi vẻ đẹp của hoa.<br>Chọn B"},{"qType":"1","qText":"Câu 7: [EMPIRE TEAM] Trong câu “Anh ta có một giọng nói trầm ấm,” từ “trầm ấm” có thể được hiểu là gì?","image":null,"options":{"A":"Trầm lắng và ấm áp","B":"Trầm mặc và ấm cúng","C":"Trầm trọng và ấm êm","D":"Trầm buồn và ấm áp"},"correct":"A","explanation":"Lời Giải:<br>A. Trầm lắng và ấm áp: Từ “trầm” chỉ âm vực thấp, còn “ấm” chỉ cảm giác dễ chịu, gần gũi mà giọng nói mang lại.<br>B. Trầm mặc và ấm cúng: “Trầm mặc” chỉ sự im lặng, không nói, không phù hợp với ngữ cảnh miêu tả giọng nói.<br>C. Trầm trọng và ấm êm: “Trầm trọng” chỉ sự nghiêm túc, quan trọng, không liên quan đến âm sắc của giọng nói.<br>D. Trầm buồn và ấm áp: “Trầm buồn” chỉ cảm giác buồn bã, u sầu, không phải là đặc điểm thường dùng để miêu tả giọng nói.<br>Chọn A"},{"qType":"1","qText":"Câu 8. [EMPIRE TEAM] Trong câu “Người ấy có một phong thái ung dung tự tại,” từ nào có thể thay thế cho “ung dung” mà không làm thay đổi ý nghĩa?","image":null,"options":{"A":"Thảnh thơi","B":"Bình thản","C":"Ngượng ngùng","D":"Tự tại"},"correct":"A","explanation":"Lời Giải:<br>A. Thảnh thơi: Có nghĩa là thong thả, không vội vàng, không lo lắng.<br>B. Bình thản: Có nghĩa là yên ổn, không bị xáo trộn, không lo lắng.<br>C. Ngượng ngùng: Chỉ cảm giác ngại ngùng, lúng túng.<br>D. Tự tại: Mang nghĩa tự do, thoải mái, không bị ràng buộc, không phải là từ đồng nghĩa hoàn toàn với “ung dung”.<br>Chọn A"},{"qType":"1","qText":"Câu 9. [EMPIRE TEAM] “Đêm qua mơ ngủ thấy nàng/ Răng trắng như ngọc, má đào như hoa” – “Ngọc” và “hoa” tượng trưng cho điều gì?","image":null,"options":{"A":"Sự giàu có và sắc đẹp","B":"Sự tinh khiết và tươi tắn","C":"Sự quý phái và quyến rũ","D":"Sự cao sang và kiêu sa"},"correct":"B","explanation":"Lời Giải:<br>B. Sự tinh khiết và tươi tắn:<br>+ “Ngọc” thường được liên tưởng đến sự trong trắng, tinh khiết và quý giá. Trong văn học, ngọc thường được dùng để miêu tả làn da, hàm răng của người phụ nữ.<br>+ “Hoa” thường tượng trưng cho vẻ đẹp tươi tắn, rực rỡ của tuổi trẻ và sức sống. “Má đào như hoa” là hình ảnh so sánh quen thuộc để miêu tả đôi má ửng hồng của người con gái.<br>A. Sự giàu có và sắc đẹp: Mặc dù ngọc có thể liên quan đến sự giàu có, nhưng trong câu thơ này, nó nhấn mạnh vào sự tinh khiết hơn là giá trị vật chất.<br>C. Sự quý phái và quyến rũ: Mặc dù ngọc và hoa có thể gợi lên sự quý phái, nhưng câu thơ nhấn mạnh vào vẻ đẹp tự nhiên, trong sáng hơn là sự quyến rũ.<br>D. Sự cao sang và kiêu sa: Câu thơ không đề cập đến sự cao sang hay kiêu sa mà tập trung vào vẻ đẹp thuần khiết, tự nhiên.<br>Chọn B"},{"qType":"1","qText":"Câu 10. [EMPIRE TEAM] Tìm từ đồng nghĩa với “chùng chình” có trong câu thơ sau:\n“Non xanh nước biếc tha hồ dạo\nRượu ngọt chè tươi mặc sức say\nThuyền nan một chiếc chùng chình đợi\nCần trúc dăm câu thong thả buông.”","image":null,"options":{"A":"Ngập ngừng","B":"Chậm rãi","C":"Lưỡng lự","D":"Đắn đo"},"correct":"B","explanation":"Lời Giải:<br>B. Chậm rãi: Từ này diễn tả chính xác sự thong thả, không vội vàng của con thuyền.<br>A. Ngập ngừng: Mang nghĩa do dự, lưỡng lự, không dứt khoát.<br>C. Lưỡng lự: Cũng có nghĩa do dự, không quyết đoán.<br>D. Đắn đo: Chỉ sự suy nghĩ kỹ lưỡng trước khi quyết định.<br>Chọn B"},{"qType":"1","qText":"Câu 11. [EMPIRE TEAM] Trong câu thơ “Non cao gió dựng sông đầy nắng chang chang,” từ “dựng” được hiểu như thế nào?","image":null,"options":{"A":"Xây dựng","B":"Ngẩng cao","C":"Tạo dựng","D":"Dựng đứng"},"correct":"D","explanation":"Lời Giải:<br>D. Dựng đứng: Trong ngữ cảnh này, \"dựng\" mang nghĩa làm cho sóng nổi lên, tạo thành những con sóng lớn đứng thẳng trên mặt sông.<br>A. Xây dựng: Không liên quan đến tác động của gió lên sóng nước.<br>B. Ngẩng cao: Thường dùng để miêu tả người hoặc vật thể vươn lên.<br>C. Tạo dựng: Mang nghĩa tạo ra, xây dựng nên cái gì đó.<br>Chọn D"},{"qType":"1","qText":"Câu 12. [EMPIRE TEAM] Từ “dậy sóng” trong câu “Tin đồn thất thiệt khiến dư luận dậy sóng.” Có nghĩa là:","image":null,"options":{"A":"Phát triển mạnh mẽ, lan rộng.","B":"Gây ra sự phản đối, bất bình.","C":"Gây ra sự hỗn loạn, rối ren.","D":"Gây ra sự tò mòi, hiếu kỳ."},"correct":"B","explanation":"Lời Giải:<br>B. Gây ra sự phản đối, bất bình: Từ \"dậy sóng\" trong ngữ cảnh này ám chỉ sự phản ứng mạnh mẽ, sự bất bình của dư luận trước tin đồn thất thiệt. Nó không chỉ là sự lan rộng thông tin (A) mà còn là sự phản ứng tiêu cực, sự phẫn nộ của công chúng.<br>A. Phát triển mạnh mẽ, lan rộng: Mặc dù tin đồn có thể lan rộng, nhưng \"dậy sóng\" nhấn mạnh vào phản ứng của dư luận hơn là quá trình lan truyền.<br>C. Gây ra sự hỗn loạn, rối ren: \"Dậy sóng\" có thể dẫn đến sự hỗn loạn, nhưng ý nghĩa chính vẫn là sự phản đối, bất bình.<br>D. Gây ra sự tò mò, hiếu kỳ: Mặc dù tin đồn có thể gây tò mò, nhưng \"dậy sóng\" tập trung vào phản ứng tiêu cực hơn là sự tò mò.<br>Chọn B"},{"qType":"1","qText":"Câu 13. [EMPIRE TEAM] Từ “lên hương” trong câu “Sau khi đổi nghề, cuộc sống của anh ta lên hương hẳn.” Có nghĩa là:","image":null,"options":{"A":"Trở nên giàu có, sung túc.","B":"Trở nên nổi tiếng, được nhiều người biết đến.","C":"Trở nên may mắn, thuận lợi.","D":"Trở nên tốt đẹp, hạnh phúc hơn."},"correct":"D","explanation":"Lời Giải:<br>A. Trở nên giàu có, sung túc: Mặc dù có thể liên quan đến sự sung túc, nhưng “lên hương” không chỉ đơn thuần là giàu có về vật chất mà còn bao gồm cả sự hạnh phúc, viên mãn trong cuộc sống.<br>D. Trở nên tốt đẹp, hạnh phúc hơn: Từ “lên hương” trong ngữ cảnh này có nghĩa là cuộc sống của anh ta đã được cải thiện đáng kể, trở nên sung túc, thoải mái và hạnh phúc hơn so với trước khi đổi nghề.<br>B. Trở nên nổi tiếng, được nhiều người biết đến: Không liên quan đến ý nghĩa của “lên hương” trong ngữ cảnh này.<br>C. Trở nên may mắn, thuận lợi: Mặc dù đổi nghề có thể mang lại may mắn, nhưng “lên hương” nhấn mạnh vào sự cải thiện toàn diện về chất lượng cuộc sống.<br>Chọn D"},{"qType":"1","qText":"Câu 14. [EMPIRE TEAM] Từ “vừa” trong câu “Anh ta làm việc vừa đủ ăn” có nghĩa là:","image":null,"options":{"A":"Đạt mức trung bình.","B":"Vừa vặn, không thừa không thiếu.","C":"Đủ để trang trải cuộc sống.","D":"Không quá nhiều, không quá ít."},"correct":"C","explanation":"Lời Giải:<br>C. Đủ để trang trải cuộc sống: Trong ngữ cảnh này, từ \"vừa\" không chỉ mức độ trung bình (A) hay vừa vặn không thừa không thiếu (B), mà nó nhấn mạnh vào việc số tiền kiếm được từ công việc chỉ đủ để đáp ứng nhu cầu cơ bản của cuộc sống, không dư dả.<br>A. Đạt mức trung bình: Không nói lên được việc số tiền kiếm được có đủ sống hay không.<br>B. Vừa vặn, không thừa không thiếu: Không phù hợp với ngữ cảnh vì câu nói ám chỉ sự eo hẹp về tài chính.<br>D. Không quá nhiều, không quá ít: Mang tính chung chung, không thể hiện rõ ý nghĩa của “vừa đủ ăn”.<br>Chọn C"},{"qType":"1","qText":"Câu 15. [EMPIRE TEAM] Từ “mềm” trong câu “lời nói mềm mỏng” có nghĩa là:","image":null,"options":{"A":"Dịu dàng, êm ái.","B":"Không rõ ràng, mơ hồ.","C":"Yếu đuối, dễ bị tổn thương.","D":"Tất cả đều sai."},"correct":"A","explanation":"Lời Giải:<br>A. Dịu dàng, êm ái: Trong ngữ cảnh này, \"mềm\" chỉ cách nói chuyện nhẹ nhàng, êm dịu, không gay gắt hay thô lỗ.<br>B. Không rõ ràng, mơ hồ: Không liên quan đến ý nghĩa của “mềm” trong trường hợp này.<br>C. Yếu đuối, dễ bị tổn thương: Đây là nghĩa khác của từ “mềm” khi nói về tính cách, không phải cách nói chuyện.<br>Chọn A"},{"qType":"1","qText":"Câu 16. [EMPIRE TEAM] Trong câu “Người Cha mái tóc bạc, Đốt lửa cho anh nằm,” từ “đốt” mang nghĩa bóng là:","image":null,"options":{"A":"Sưởi ấm, xua tan giá lạnh.","B":"Truyền lửa, tiếp thêm sức mạnh.","C":"Hy sinh, chịu đựng gian khổ.","D":"Thắp sáng, soi đường chỉ lối."},"correct":"A","explanation":"Lời Giải:<br>A. Sưởi ấm, xua tan giá lạnh: Trong ngữ cảnh này, “đốt lửa” không chỉ đơn thuần là hành động nhóm lửa mà còn mang ý nghĩa biểu tượng cho sự quan tâm, chăm sóc của Bác Hồ dành cho các chiến sĩ. Ngọn lửa được thắp lên để sưởi ấm, xua tan cái lạnh giá của đêm khuya và mang lại sự ấm áp về cả thể xác lẫn tinh thần.<br>B. Truyền lửa, tiếp thêm sức mạnh: Mặc dù hình ảnh ngọn lửa có thể liên tưởng đến sự truyền lửa, nhưng trong câu thơ này, ý nghĩa chính vẫn là sự sưởi ấm và chăm sóc.<br>C. Hy sinh, chịu đựng gian khổ: Không liên quan đến ý nghĩa của “đốt lửa” trong câu thơ.<br>D. Thắp sáng, soi đường chỉ lối: Mặc dù ngọn lửa có thể mang ý nghĩa soi sáng, nhưng trong trường hợp này, nó tập trung vào việc mang lại ấm áp và sự quan tâm.<br>Chọn A"},{"qType":"1","qText":"Câu 17. [EMPIRE TEAM] “Nôn nao” trong câu thơ:\n“Xuân này hơn hẳn mấy xuân qua,\nPhấn khởi, nôn nao, lòng xốn xang”\nđược hiểu là:","image":null,"options":{"A":"Bồn chồn, háo hức.","B":"Vội vã, hấp tấp.","C":"Lo lắng, bất an.","D":"Ngại ngùng, e thẹn."},"correct":"A","explanation":"Lời Giải:<br>A. Bồn chồn, háo hức: Từ “nôn nao” trong ngữ cảnh này diễn tả cảm xúc mong chờ, háo hức, xen lẫn chút bồn chồn, hồi hộp trước những điều tốt đẹp của mùa xuân.<br>B. Vội vã, hấp tấp: Không liên quan đến cảm xúc mong chờ, háo hức.<br>C. Lo lắng, bất an: Không phù hợp với không khí phấn khởi của mùa xuân.<br>D. Ngại ngùng, e thẹn: Không liên quan đến cảm xúc trong câu thơ.<br>Chọn A"},{"qType":"1","qText":"Câu 18. [EMPIRE TEAM] Trong câu “Sương trắng rỏ đầu cành như giọt sữa,” từ “rỏ” có nghĩa là:","image":null,"options":{"A":"Nhỏ giọt, rơi xuống.","B":"Tan chảy, biến mất.","C":"Đọng lại, đọng thành giọt.","D":"Bốc hơi, bay lên."},"correct":"A","explanation":"Lời Giải:<br>A. Nhỏ giọt, rơi xuống: Từ “rỏ” trong ngữ cảnh này mô tả hình ảnh những giọt sương đọng trên đầu cành và rơi xuống. Các lựa chọn khác không phù hợp với ngữ cảnh và ý nghĩa của câu thơ.<br>Chọn A"},{"qType":"1","qText":"Câu 19. [EMPIRE TEAM] Trong câu “Hắn ta nói năng lấp lửng”, từ “lấp lửng” có nghĩa là:","image":null,"options":{"A":"Nói nhỏ, không rõ ràng","B":"Nói vòng vo, không đi thẳng vào vấn đề","C":"Nói lắp bắp, không trôi chảy","D":"Nói dối, không thành thật"},"correct":"B","explanation":"Lời Giải:<br>B. Nói vòng vo, không đi thẳng vào vấn đề: Từ \"lấp lửng\" ám chỉ cách nói chuyện không rõ ràng, úp mở, không trực tiếp trả lời câu hỏi hoặc đưa ra thông tin cụ thể.<br>Chọn B"},{"qType":"1","qText":"Câu 20. [EMPIRE TEAM] Trong câu thơ \"Con đò nhỏ sang ngang\", từ \"ngang\" được hiểu theo nghĩa:","image":null,"options":{"A":"Đi qua sông","B":"Vượt qua khó khăn","C":"Bỏ lại quá khứ","D":"Cả A và B"},"correct":"D","explanation":"Lời Giải:<br>- Trong câu thơ \"Con đò nhỏ sang ngang\", từ \"ngang\" được hiểu theo nghĩa:<br>A. Đi qua sông: Đây là nghĩa gốc và trực tiếp của từ \"ngang\" trong ngữ cảnh này, chỉ hành động di chuyển của con đò qua sông.<br>- Tuy nhiên, trong văn chương, từ \"ngang\" còn có thể mang nghĩa bóng:<br>B. Vượt qua khó khăn: Con đò vượt sông có thể tượng trưng cho việc vượt qua những thử thách, khó khăn trong cuộc sống.<br>Chọn D"},{"qType":"1","qText":"Câu 21. [EMPIRE TEAM] Trong câu \"Cô ấy có một vẻ đẹp mặn mà\", từ \"mặn mà\" được hiểu là:","image":null,"options":{"A":"Tươi tắn, trẻ trung","B":"Quyến rũ, hấp dẫn","C":"Đằm thắm, sâu sắc","D":"Sang trọng, quý phái"},"correct":"C","explanation":"Lời Giải:<br>- C. Đằm thắm, sâu sắc: Từ \"mặn mà\" thường dùng để miêu tả vẻ đẹp của người phụ nữ trưởng thành, không chỉ ở ngoại hình mà còn toát lên từ thần thái, tính cách. Nó gợi lên sự chín chắn, từng trải và sức hút khó cưỡng.<br>- A. Tươi tắn, trẻ trung: Thường dùng để miêu tả vẻ đẹp của tuổi trẻ, sự năng động và tràn đầy sức sống.<br>- B. Quyến rũ, hấp dẫn: Mặc dù có phần liên quan, nhưng \"quyến rũ\" thiên về sự gợi cảm, lôi cuốn về mặt thể xác hơn là vẻ đẹp đằm thắm.<br>- D. Sang trọng, quý phái: \"Sang trọng\" thường liên quan đến vẻ ngoài hào nhoáng, đẳng cấp, trong khi \"mặn mà\" nhấn mạnh vào vẻ đẹp nội tâm và sự chín chắn.<br>Chọn C"},{"qType":"1","qText":"Câu 22. [EMPIRE TEAM] Trong câu \"Trời xanh quen thói má hồng đánh ghen\", từ \"ghen\" được hiểu là:","image":null,"options":{"A":"Đố kỵ, tị nạnh.","B":"Ganh đua, hơn thua.","C":"Không được hiểu theo nghĩa gì.","D":"Sự hờn giận vô cớ."},"correct":"C","explanation":"Lời Giải:<br>Chọn C"},{"qType":"1","qText":"Câu 23. [EMPIRE TEAM] Từ “nặng” trong câu “Anh ấy bị bệnh nặng” có nghĩa gần với từ “nặng” trong câu nào sau đây?","image":null,"options":{"A":"Cục đá này nặng quá","B":"Anh ấy có tội rất nặng","C":"Bầu không khí nặng nề","D":"Lời nói nặng như chì"},"correct":"B","explanation":"Lời Giải:<br>B. Anh ấy có tội rất nặng: Trong cả hai câu, từ “nặng” đều mang nghĩa chỉ mức độ nghiêm trọng, trầm trọng của một vấn đề. Ở câu đầu tiên, “nặng” chỉ mức độ nghiêm trọng của bệnh tật, còn ở câu thứ hai, “nặng” chỉ mức độ nghiêm trọng của tội lỗi.<br>A. Cục đá này nặng quá: Từ “nặng” chỉ khối lượng, trọng lượng vật lý.<br>C. Bầu không khí nặng nề: Từ “nặng nề” chỉ cảm giác ngột ngạt, khó chịu về tinh thần.<br>D. Lời nói nặng như chì: Từ “nặng” chỉ sự đanh thép, khó nghe của lời nói.<br>Chọn B"},{"qType":"1","qText":"Câu 24. [EMPIRE TEAM] Từ “tay” trong câu “Anh ấy bắt tay người đối diện” có nghĩa khác với từ “tay” trong câu nào?","image":null,"options":{"A":"Cô ấy là một tay chơi golf cừ khôi","B":"Cậu bé bị đau tay","C":"Chiếc áo này do chính tay mẹ tôi may","D":"Anh ấy là tay sai của kẻ xấu"},"correct":"A","explanation":"Lời Giải:<br>A. Cô ấy là một tay chơi golf cừ khôi: \"tay\" ở đây có nghĩa là người có khả năng, kỹ năng trong một lĩnh vực nào đó.<br>B. Cậu bé bị đau tay: “tay” chỉ bộ phận cơ thể bị đau.<br>C. Chiếc áo này do chính tay mẹ tôi may: “tay” chỉ hành động của mẹ dùng tay để may áo.<br>D. Anh ấy là tay sai của kẻ xấu: “tay sai” là người làm việc cho kẻ khác, nhưng “tay” vẫn chỉ người đó.<br>Chọn A"},{"qType":"1","qText":"Câu 25. [EMPIRE TEAM] Từ “khúc khuỷu” trong câu “Con đường làng khúc khuỷu dẫn đến ngôi chùa cổ” có nghĩa gần nhất với:","image":null,"options":{"A":"Cong queo","B":"Gồ ghề","C":"Dài ngoẵng","D":"Hẹp"},"correct":"A","explanation":"Lời Giải:<br>A. Cong queo: “Khúc khuỷu” mô tả một con đường có nhiều đoạn gấp khúc, không thẳng, uốn lượn.<br>B. Gồ ghề: Mô tả bề mặt đường không bằng phẳng.<br>C. Dài ngoằng: Mô tả độ dài của đường.<br>D. Hẹp: Mô tả bề rộng của đường.<br>Chọn A"},{"qType":"1","qText":"Câu 26. [EMPIRE TEAM] Trong câu thơ \"Rồi hóng mát thuở ngày trường\", từ \"hóng mát\" mang ý nghĩa gì?","image":null,"options":{"A":"Nghỉ ngơi, thư giãn.","B":"Chờ đợi một điều gì đó.","C":"Tận hưởng không khí trong lành.","D":"Trốn tránh thực tại."},"correct":"A","explanation":"Lời Giải:<br>-A. Nghỉ ngơi, thư giãn: Trong ngữ cảnh của câu thơ, \"hóng mát\" không chỉ đơn thuần là tận hưởng không khí mát mẻ mà còn mang ý nghĩa nghỉ ngơi, thư giãn sau những giờ làm việc mệt mỏi. \"Thuở ngày trường\" ám chỉ thời gian rảnh rỗi, không vướng bận công việc.<br>Chọn A"},{"qType":"1","qText":"Câu 27. [EMPIRE TEAM] Trong câu \"Chàng tuổi trẻ vốn dòng hào kiệt, xông pha ngoài cõi biên thùy\", từ \"hào kiệt\" có nghĩa là gì?","image":null,"options":{"A":"Tài giỏi xuất chúng.","B":"Dũng cảm, không sợ gian khổ.","C":"Giàu có, quyền lực.","D":"Có dòng dõi quý tộc."},"correct":"A","explanation":"Lời Giải:<br>A. Tài giỏi xuất chúng: \"Hào kiệt\" thường được dùng để chỉ những người có tài năng vượt trội, xuất chúng, thường là trong lĩnh vực quân sự hoặc lãnh đạo. Trong câu thơ, \"hào kiệt\" nhấn mạnh tài năng và phẩm chất đặc biệt của chàng trai trẻ.<br>Chọn A"},{"qType":"1","qText":"Câu 28. [EMPIRE TEAM] Từ \"chừng\" trong câu văn \"Tôi chừng như đã hiểu ra vấn đề\" được hiểu là:","image":null,"options":{"A":"Chắc chắn, quả quyết.","B":"Ngờ ngợ, phỏng đoán.","C":"Lưỡng lự, do dự.","D":"Kỳ vọng, mong muốn."},"correct":"B","explanation":"Lời Giải:<br>B. Ngờ ngợ, phỏng đoán: Trong câu văn trên, \"chừng\" mang nghĩa phỏng đoán, chưa chắc chắn hoàn toàn. Người nói có cảm giác mình đã hiểu vấn đề nhưng vẫn chưa dám khẳng định chắc chắn.<br>Chọn B"},{"qType":"1","qText":"Câu 29. [EMPIRE TEAM] Trong câu thơ \"Sương rơi cửa sổ mờ mờ/ Tiếng gà gáy le te gợi nhớ quê nhà\", từ \"le te\" diễn tả:","image":null,"options":{"A":"Âm thanh nhỏ nhẹ, yếu ớt.","B":"Âm thanh đứt quãng, không liên tục.","C":"Âm thanh buồn bã, thê lương.","D":"Âm thanh xa xăm, mơ hồ."},"correct":"A","explanation":"Lời Giải:<br>A. Âm thanh nhỏ nhẹ, yếu ớt: Từ “le te” thường được dùng để mô tả âm thanh nhỏ, yếu ớt, có phần đứt quãng. Trong câu thơ trên, “le te” gợi lên tiếng gà gáy yếu ớt trong màn sương sớm, tạo nên không khí tĩnh mịch và cảm giác nhớ quê hương da diết.<br>B. Âm thanh đứt quãng, không liên tục: Mặc dù tiếng gà có thể gáy không liên tục, nhưng “le te” không nhấn mạnh đặc điểm này.<br>C. Âm thanh buồn bã, thê lương: “le te” không mang nghĩa buồn bã, mà chỉ đơn thuần là nhỏ nhẹ.<br>D. Âm thanh xa xăm, mơ hồ: “le te” không gợi lên khoảng cách, mà tập trung vào độ nhỏ của âm thanh.<br>Chọn A"},{"qType":"1","qText":"Câu 30: [EMPIRE TEAM] Từ “khắc khoải” (in đậm, gạch chân) trong câu thơ sau gần nghĩa nhất với:\n“Gió đưa cành trúc la đà\nTiếng chuông khắc khoải đưa ta về chùa”\n(Sưu tầm)","image":null,"options":{"A":"Nhẹ nhàng","B":"Da diết","C":"Thảng thốt","D":"Vội vã"},"correct":"B","explanation":"Lời Giải:<br>B. Da diết: Từ “khắc khoải” trong câu thơ trên mang nghĩa là sâu sắc, da diết, thấm thía, thường dùng để diễn tả nỗi buồn, sự nhớ nhung, thương tiếc. Tiếng chuông chùa khắc khoải gợi lên những cảm xúc sâu lắng, thôi thúc con người hướng về nơi chốn tâm linh.<br>Chọn B"},{"qType":"1","qText":"Câu 31: [EMPIRE TEAM] Từ “ngạo nghễ” (in đậm, gạch chân) trong câu văn sau gần nghĩa nhất với:\n“Nàng bước đi ngạo nghễ trên sàn diễn”","image":null,"options":{"A":"Tự tin","B":"Kiêu hãnh","C":"Trịch thượng","D":"Tự phụ"},"correct":"B","explanation":"Lời Giải:<br>B. Kiêu hãnh: Từ “ngạo nghễ” trong câu văn trên mang nghĩa thể hiện sự tự hào, kiêu hãnh về bản thân, thường đi kèm với dáng vẻ tự tin, đôi khi hơi quá mức.<br>A. Tự tin: Mặc dù người ngạo nghễ thường có sự tự tin, nhưng “tự tin” không diễn tả hết được sắc thái kiêu hãnh, hơi quá mức của “ngạo nghễ”.<br>C. Trịch thượng: Mang nghĩa coi thường người khác, có phần tiêu cực hơn “ngạo nghễ”.<br>D. Tự phụ: Mang nghĩa đánh giá quá cao bản thân, có phần tiêu cực hơn “ngạo nghễ”.<br>Chọn B"},{"qType":"1","qText":"Câu 32: [EMPIRE TEAM] Từ “lạc quan” (in đậm, gạch chân) trong câu văn sau gần nghĩa nhất với:\n“Cô ấy luôn lạc quan dù gặp khó khăn”","image":null,"options":{"A":"Vui vẻ","B":"Tích cực","C":"Yêu đời","D":"Hy vọng"},"correct":"B","explanation":"Lời Giải:<br>B. Tích cực: Từ “lạc quan” trong câu văn trên mang nghĩa là có thái độ tích cực, tin tưởng vào những điều tốt đẹp trong tương lai, ngay cả khi gặp khó khăn, thử thách.<br>A. Vui vẻ: Mặc dù người lạc quan thường vui vẻ, nhưng “vui vẻ” chỉ là một biểu hiện của sự lạc quan, không phải là ý nghĩa chính.<br>C. Yêu đời: Tương tự như “vui vẻ”, “yêu đời” là một biểu hiện của sự lạc quan.<br>D. Hy vọng: “Hy vọng” là một phần của sự lạc quan, nhưng “lạc quan” bao hàm ý nghĩa rộng hơn, bao gồm cả thái độ tích cực và niềm tin vào tương lai.<br>Chọn B"},{"qType":"1","qText":"Câu 33: [EMPIRE TEAM] Từ “lầm than” (in đậm, gạch chân) trong câu văn sau gần nghĩa nhất với:\n“Cuộc đời lầm than của người phụ nữ ấy”","image":null,"options":{"A":"Bất hạnh","B":"Khó khăn","C":"Vất vả","D":"Nghèo khổ"},"correct":"A","explanation":"Lời Giải:<br>A. Bất hạnh: Từ “lầm than” trong câu văn trên mang nghĩa là gặp nhiều đau khổ, bất hạnh trong cuộc sống.<br>B. Khó khăn: Chỉ tình huống gặp trở ngại, không diễn tả hết sự đau khổ kéo dài.<br>C. Vất vả: Chỉ sự mệt nhọc về thể xác, không bao gồm các khía cạnh tinh thần của sự lầm than.<br>D. Nghèo khổ: Chỉ sự thiếu thốn về vật chất, không phải là toàn bộ ý nghĩa của “lầm than”.<br>Chọn A"},{"qType":"1","qText":"Câu 34: [EMPIRE TEAM] Từ “chập chờn” (in đậm, gạch chân) trong câu văn sau gần nghĩa nhất với:\n“Ánh đèn đường chập chờn trong màn sương”","image":null,"options":{"A":"Mờ ảo","B":"Le lói","C":"Lập lòe","D":"Nhập nhoạng"},"correct":"C","explanation":"Lời Giải:<br>C. Lập lòe: Từ “chập chờn” trong câu văn trên mô tả ánh đèn lúc sáng lúc tắt, lúc ẩn lúc hiện, không ổn định. Trong các phương án được đưa ra, “lập lòe” là từ gần nghĩa nhất, cũng diễn tả sự lúc ẩn lúc hiện, không đều đặn của ánh sáng.<br>A. Mờ ảo: Chỉ sự không rõ ràng, mơ hồ, không diễn tả được sự thay đổi liên tục của ánh sáng.<br>B. Le lói: Chỉ ánh sáng yếu ớt, gần tắt, không diễn tả được sự lúc ẩn lúc hiện.<br>D. Nhập nhoạng: Chỉ sự thiếu ánh sáng, không đủ để nhìn rõ, không diễn tả được sự thay đổi liên tục của ánh sáng.<br>Chọn C"},{"qType":"1","qText":"Câu 35. [EMPIRE TEAM] Từ “quặn thắt” (in đậm, gạch chân) trong câu văn sau gần nghĩa nhất với:\n“Trái tim anh quặn thắt khi nghe tin dữ”","image":null,"options":{"A":"Đau đớn","B":"Thắt lại","C":"Co thắt","D":"Nhói buốt"},"correct":"A","explanation":"Lời Giải:<br>A. Đau đớn: Từ “quặn thắt” trong câu văn trên mang nghĩa đau đớn, thể hiện cảm giác đau đớn tột cùng về mặt tinh thần. Nó thường được dùng để diễn tả nỗi đau xót, thương cảm, tuyệt vọng.<br>B. Thắt lại: Chỉ sự thu hẹp về kích thước, không diễn tả được cảm giác đau đớn.<br>C. Co thắt: Thường dùng để chỉ sự co rút của cơ bắp, không phù hợp với ngữ cảnh.<br>D. Nhói buốt: Diễn tả cảm giác đau nhói về thể xác, không phải là đau đớn về mặt tinh thần như “quặn thắt”.<br>Chọn A"},{"qType":"1","qText":"Câu 36. [EMPIRE TEAM] Chọn một từ mà nghĩa của nó KHÔNG cùng nhóm với các từ còn lại:","image":null,"options":{"A":"lủi thủi","B":"lẻ loi","C":"cô độc","D":"hiu quạnh"},"correct":"D","explanation":"Lời Giải:<br>Lủi thủi, lẻ loi, cô độc: Đều chỉ trạng thái một mình, không có ai bên cạnh.<br>Hiu quạnh: Chỉ sự vắng vẻ, tĩnh mịch của không gian, cảnh vật.<br>Chọn D"},{"qType":"1","qText":"Câu 37. [EMPIRE TEAM] Chọn một từ mà nghĩa của nó KHÔNG cùng nhóm với các từ còn lại:","image":null,"options":{"A":"lượn lờ","B":"lả lướt","C":"uyển chuyển","D":"lăn tăn"},"correct":"D","explanation":"Lời Giải:<br>Lượn lờ, lả lướt, uyển chuyển: Đều chỉ sự chuyển động nhẹ nhàng, mềm mại, uyển chuyển.<br>Lăn tăn: Chỉ sự chuyển động nhỏ, nhẹ, liên tục trên bề mặt.<br>Chọn D"},{"qType":"1","qText":"Câu 38. [EMPIRE TEAM] Chọn một từ mà nghĩa của nó KHÔNG cùng nhóm với các từ còn lại:","image":null,"options":{"A":"lấm tấm","B":"lất phất","C":"lác đác","D":"xối xả"},"correct":"D","explanation":"Lời Giải:<br>Lấm tấm, lất phất, lác đác: Đều chỉ sự xuất hiện với số lượng ít, thưa thớt, rải rác.<br>Xối xả: Chỉ sự đổ xuống mạnh mẽ, liên tục, với số lượng lớn.<br>Chọn D"},{"qType":"1","qText":"Câu 39: [EMPIRE TEAM] Chọn một từ mà nghĩa của nó KHÔNG cùng nhóm với các từ còn lại:","image":null,"options":{"A":"Rộn ràng","B":"Náo nhiệt","C":"Tấp nập","D":"Tĩnh mịch"},"correct":"D","explanation":"Lời Giải:<br>Rộn ràng, náo nhiệt, tấp nập: Đều chỉ sự sôi động, đông vui, nhiều hoạt động.<br>Tĩnh mịch: Chỉ sự yên tĩnh, vắng lặng, không có hoạt động.<br>Chọn D"},{"qType":"1","qText":"Câu 40: [EMPIRE TEAM] Chọn một từ mà nghĩa của nó KHÔNG cùng nhóm với các từ còn lại:","image":null,"options":{"A":"mù mịt","B":"mịt mù","C":"mờ mịt","D":"mịt mờ"},"correct":"C","explanation":"Lời Giải:<br>Mù mịt, mịt mù, mịt mờ: Đều chỉ tình trạng không thể nhìn thấy gì, tối tăm, không rõ ràng.<br>Mờ mịt: Chỉ sự không rõ ràng, mơ hồ về một vấn đề, tình huống nào đó. Ví dụ: tương lai mờ mịt.<br>Chọn C"},{"qType":"1","qText":"Câu 41: [EMPIRE TEAM]\n\n(1) \"Thềm nhà em lát gạch hoa, mát rượi mỗi khi hè về.\"\n(2) \"Bên thềm hoa dại, em thầm mong ước một ngày mai tươi sáng.\"\n(3) \"Thềm sông Hồng chứng kiến bao thăng trầm của lịch sử dân tộc.\"\n(4) \"Trước thềm năm học mới, các em nhỏ háo hức chuẩn bị sách vở.\"\n\nTừ \"thềm\" nào được dùng theo nghĩa gốc?","image":null,"options":{"A":"(1)","B":"(2)","C":"(3)","D":"(4)"},"correct":"A","explanation":"Lời Giải:<br>- (1) \"Thềm nhà em lát gạch hoa, mát rượi mỗi khi hè về.\": Từ \"thềm\" ở đây được dùng theo nghĩa gốc, chỉ phần đất trước cửa nhà.<br>- (2) “Bên thềm hoa dại, em thầm mong ước một ngày mai tươi sáng.”: Từ “thềm” ở đây được dùng theo nghĩa chuyển, chỉ không gian gần bậc thềm, nơi có hoa dại mọc.<br>- (3) “Thềm sông Hồng chứng kiến bao thăng trầm của lịch sử dân tộc.”: Từ “thềm” ở đây được dùng theo nghĩa chuyển, chỉ vùng đất ven sông.<br>- (4) “Trước thềm năm học mới, các em nhỏ háo hức chuẩn bị sách vở.”: Từ “thềm” ở đây được dùng theo nghĩa chuyển, chỉ khoảng thời gian ngay trước khi một sự kiện quan trọng diễn ra.<br>Chọn A"},{"qType":"1","qText":"Câu 42. [EMPIRE TEAM]\n\n(1) “Thềm nhà lát gạch men sạch sẽ, mát mẻ.”\n(2) “Thềm cuộc sống mới đang mở ra trước mắt những người trẻ đầy nhiệt huyết.”\n(3) “Thềm lục địa là vùng biển có độ sâu không quá 200 mét.”\n(4) “Trước thềm mùa xuân, vạn vật như bừng tỉnh sau giấc ngủ đông.”\n\nTừ “thềm” nào có nghĩa gần nhất với “sắp đến”?","image":null,"options":{"A":"(1)","B":"(2)","C":"(3)","D":"(4)"},"correct":"D","explanation":"Lời Giải: (4): “Trước thềm mùa xuân” có nghĩa là thời điểm ngay trước khi mùa xuân đến, mang ý nghĩa “sắp đến”.<br>Chọn D"},{"qType":"1","qText":"Câu 43. [EMPIRE TEAM] “Hớn hở” trong tiếng Việt hiện đại mang nghĩa:","image":null,"options":{"A":"Vui vẻ","B":"Tự hào","C":"Phấn khích","D":"Hào hứng"},"correct":"D","explanation":"Lời Giải:<br>D. Hào hứng: “Hớn hở” trong tiếng Việt hiện đại thường dùng để diễn tả sự hào hứng, vui vẻ, phấn khởi trước một điều gì đó sắp xảy ra hoặc đang diễn ra.<br>Chọn D"},{"qType":"1","qText":"Câu 44. [EMPIRE TEAM] “Nao nao” khi nói về cảnh vật thường gợi:","image":null,"options":{"A":"Sự chuyển động","B":"Sắc màu rực rỡ","C":"Âm thanh ồn ào","D":"Sự yên bình"},"correct":"D","explanation":"Lời Giải: D. Sự yên bình: “Nao nao” thường được dùng để miêu tả cảm xúc bâng khuâng, xao xuyến, thường liên quan đến sự tĩnh lặng, yên bình của cảnh vật. Ví dụ như:<br>- “Cảnh hoàng hôn nao nao trên sông nước.”<br>- “Tiếng chuông chùa nao nao vọng lại từ xa.”<br>Chọn D"},{"qType":"1","qText":"Câu 45. [EMPIRE TEAM] Chọn từ đồng nghĩa với \"hiểm họa\" trong câu sau: \"Chiến tranh hạt nhân là một hiểm họa khôn lường cho toàn nhân loại.\"","image":null,"options":{"A":"Nguy cơ","B":"Thách thức","C":"Khó khăn","D":"Bất trắc"},"correct":"A","explanation":"Lời Giải:<br>- Hiểm họa: Chỉ một mối đe dọa, tai ương lớn có thể gây ra hậu quả nghiêm trọng.<br>- Nguy cơ: Tương tự như hiểm họa, chỉ một khả năng có thể xảy ra và gây ra hậu quả xấu.<br>- Thách thức: Chỉ một vấn đề khó khăn cần giải quyết, không nhất thiết mang tính nguy hiểm.<br>- Khó khăn: Chỉ tình huống gây trở ngại, không dễ dàng vượt qua.<br>- Bất trắc: Chỉ sự không chắc chắn, không lường trước được.<br>Chọn A"},{"qType":"1","qText":"Câu 46. [EMPIRE TEAM] Tìm từ đồng nghĩa với \"mong manh\" trong câu: \"Hạnh phúc đôi khi thật mong manh.\"","image":null,"options":{"A":"Dễ vỡ","B":"Yếu ớt","C":"Phù du","D":"Tạm bợ"},"correct":"A","explanation":"Lời Giải:<br>- Mong manh: Chỉ sự yếu đuối, dễ bị tổn thương, dễ mất đi.<br>- Dễ vỡ: Tương tự như mong manh, chỉ sự không bền vững, dễ bị phá hủy.<br>- Yếu ớt: Chỉ sự thiếu sức mạnh, không vững vàng.<br>- Phù du: Chỉ sự ngắn ngủi, chóng qua.<br>- Tạm bợ: Chỉ sự không chắc chắn, không bền vững, thường dùng để chỉ vật chất.<br>Chọn A"},{"qType":"1","qText":"Câu 47. [EMPIRE TEAM] Tìm từ đồng nghĩa với \"nhức nhối\" trong câu văn sau: \"Vết thương nhức nhối khiến anh không thể ngủ được.\"","image":null,"options":{"A":"Đau đớn","B":"Đau nhức","C":"Nhức buốt","D":"Buốt nhói"},"correct":"B","explanation":"Lời Giải:<br>- Nhức nhối: Mô tả cảm giác đau kéo dài, âm ỉ, khó chịu.<br>- Đau nhức: Cũng mô tả cảm giác đau kéo dài, âm ỉ, tương tự như \"nhức nhối\".<br>- Đau đớn: Mô tả cảm giác đau dữ dội, thường do bị thương nặng hoặc bệnh tật.<br>- Nhức buốt: Mô tả cảm giác đau buốt, thường do lạnh hoặc do va chạm mạnh.<br>- Buốt nhói: Tương tự như \"nhức buốt\", mô tả cảm giác đau nhói, thường do lạnh hoặc do va chạm mạnh.<br>Chọn B"},{"qType":"1","qText":"Câu 48. [EMPIRE TEAM] Tìm từ đồng nghĩa với \"rợn ngợp\" trong câu văn sau: \"Cảnh tượng hùng vĩ của núi rừng khiến tôi rợn ngợp.\"","image":null,"options":{"A":"Choáng ngợp","B":"Ngộp thở","C":"Sững sờ","D":"Kinh ngạc"},"correct":"A","explanation":"Lời Giải:<br>-Rợn ngợp: Cảm giác bị choáng ngợp, kinh ngạc trước sự rộng lớn, hùng vĩ, kỳ lạ.<br>-Choáng ngợp: Tương tự như rợn ngợp, chỉ cảm giác bị áp đảo, kinh ngạc trước sự vĩ đại, kỳ diệu.<br>-Ngộp thở: Chỉ cảm giác khó thở, thiếu oxy.<br>-Sững sờ: Chỉ trạng thái bất ngờ, không nói nên lời.<br>-Kinh ngạc: Chỉ cảm giác bất ngờ, ngạc nhiên.<br>Chọn A"},{"qType":"1","qText":"Câu 49. [EMPIRE TEAM] “Cô ấy có một giọng hát trong trẻo như tiếng chim sơn ca.” Từ “trong trẻo” có nghĩa gần nhất với:","image":null,"options":{"A":"Cao vút","B":"Ngọt ngào","C":"Trong sáng","D":"Du dương"},"correct":"C","explanation":"Lời Giải:<br>- Trong trẻo: Mô tả âm thanh trong vắt, không lẫn tạp âm, gợi cảm giác thanh khiết, dễ chịu.<br>- Trong sáng: Tương tự như trong trẻo, chỉ sự tinh khiết, không bị vẩn đục, thường dùng để chỉ giọng hát, tâm hồn.<br>Chọn C"},{"qType":"1","qText":"Câu 50. [EMPIRE TEAM] “Ông lão rũ rượi bước đi trên con đường làng.” Từ “rũ rượi” có nghĩa gần nhất với:","image":null,"options":{"A":"Mệt mỏi","B":"Buồn bã","C":"Cô đơn","D":"Yếu ớt"},"correct":"D","explanation":"Lời Giải:<br>-Rũ rượi: Mô tả trạng thái ủ rũ, thiếu sức sống, thường do mệt mỏi, bệnh tật hoặc tuổi già.<br>-Yếu ớt: Tương tự như rũ rượi, chỉ sự thiếu sức lực, không khỏe mạnh.<br>Chọn D"}]}];
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyKTElQukk21DQRGAXuUcxyEePPnVeZlY0qmwvK-NdnGS47vIBcELK2eM5_9rp-V5eo-A/exec";
+        
+        // Nhúng dữ liệu đã mã hóa từ Generator vào file
+        const ENCRYPTED_USERS = "JTVCJTdCJTIyaWQlMjIlM0ElMjJodW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIySCVDMyVCOW5nJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuaHUlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIdSVFMSVCQiVCM25oJTIwTmglQzYlQjAlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnF1eW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUXUlRTElQkIlQjNuaCUyMEwlQzMlQUElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgxJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyME5ndXklRTElQkIlODVuJTIwRHUlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm5nb2MxJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwTmd1eSVFMSVCQiU4NW4lMjBEdSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydnklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJNYWklMjBWeSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmd1eWV0YW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmd1eSVFMSVCQiU4N3QlMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtoYW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQiVFMSVCQSVBM28lMjBLaGFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaG9haWFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwaSUyMEFuaCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyZ2lhbmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIJUM2JUIwJUM2JUExbmclMjBHaWFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdvYzIlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOZyVFMSVCQiU4RGMlMjBFYWthciUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGhhb2FuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRoJUUxJUJBJUEzbyUyMEFuaCUyMEVha2FyJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJsdXUlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJMJUM2JUIwdSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdvY2hhJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwSCVDMyVBMCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdhbjElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIbyVDMyVBMG5nJTIwTmclQzMlQTJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ2FuMiUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglQzMlQTAlMjBOZyVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgyJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyMEdpYSUyME5naCVDNCVBOWElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgzJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyMEhDTSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybWFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyVHJpJUUxJUJCJTg3dSUyME0lRTElQkElQUJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJkdW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUGglQzMlQkElMjBEJUM1JUE5bmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmR1eWVuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTSVFMSVCQiVCOSUyMER1eSVDMyVBQW4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxhbSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkIlOTNuZyUyMEwlQzMlQTJtJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0YW0lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUciVFMSVCQSVBN24lMjBUJUMzJUEybSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmh1bmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVFMSVCQSVBMW0lMjBOaHVuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyYW4lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJBbiUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJpJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmd1eSVFMSVCQiU4NW4lMjBWaSVFMSVCQSVCRnQlMjBUciVDMyVBRCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydmklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUcmklRTElQkIlODd1JTIwVmklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnRpbmglMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUJUUxJUJCJUFCJTIwSCVFMSVCQiVBRnUlMjBUJUUxJUJCJTg5bmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyaSVFMSVCQiU4N3UlMjAlQzMlODJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0aGFuZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyJUUxJUJBJUE3biUyMCVDNCU5MGluaCUyMEMlQzMlQjRuZyUyMFRoJUUxJUJBJUFGbmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtpZXQlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjIlQzQlOTBvJUMzJUEwbiUyMFQlRTElQkElQTVuJTIwS2klRTElQkIlODd0JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJhdSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkElQTNpJTIwJUMzJTgydSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIycXVhbiUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMk1pbmglMjBRdSVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmJhbyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMiVDNCU5MCVFMSVCQiVBOWMlMjBCJUUxJUJBJUEzbyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJhbmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUaHUlMjBUcmFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJpMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRoYW5oJTIwVHIlQzMlQUQlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnRoYW8lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVDNiVCMCVDNiVBMW5nJTIwVGglRTElQkElQTNvJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJkdW9uZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMk5oJUUxJUJBJUFEdCUyMEQlQzYlQjAlQzYlQTFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaHVuZzElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIJUMzJUI5bmclMjBQaG9uZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmh1MSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkdpYSUyME5odSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIycGh1b25nYW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUM2JUIwJUM2JUExbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnV5ZW4lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjElMjIlMkMlMjJuYW1lJTIyJTNBJTIyVXklQzMlQUFuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJob2FuZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtoYW5nMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMktoYW5nJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJraG9pJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyS2glQzMlQjRpJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0cmlldSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkwlQzMlQUElMjBRdSVFMSVCQiU5MWMlMjBUcmklRTElQkIlODd1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJodXklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUciVFMSVCQSVBN24lMjBIdXklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm1pbmglMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOaCVFMSVCQSVBRHQlMjBNaW5oJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJjaGF1JTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQ2glQzMlQTJ1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ2ElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOZ2ElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmRhaSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyJUUxJUJCJThEbmclMjAlQzQlOTAlRTElQkElQTFpJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJodXklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJHaWElMjBIdXklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmR1YyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMk1pbmglMjAlQzQlOTAlRTElQkIlQTljJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJxdXluaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMk5ndXklRTElQkIlODVuJTIwTmglQzYlQjAlMjBRdSVFMSVCQiVCM25oJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ29jJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIySCVDMyVBMCUyMEglRTElQkElQTNpJTIwTmclRTElQkIlOERjJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJueW55JTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQyVDMyVBMXAlMjBOZ3V5JUUxJUJCJTg1biUyME55JTIwTnklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjBUaCVFMSVCQiU4QiUyMFBoJUM2JUIwJUM2JUExbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm5odTIlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVFMSVCQSVBMW0lMjBMb25nJTIwR2lhJTIwTmglQzYlQjAlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnBoaSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUUxJUJBJUExbSUyME5nJUUxJUJCJThEYyUyMFBoaSUyMiU3RCU1RA=="; 
+        
+        let currentStudent = { id: "", name: "" };
+        let sectionStartTimes = {};
+
+        async function handleLogin() {
+            const id = document.getElementById('hs-id').value.trim();
+            const pass = document.getElementById('hs-pass').value.trim();
+            const msg = document.getElementById('login-msg');
+            
+            if(!id || !pass) return msg.innerText = "Nhập đủ ID và Mật khẩu!";
+            
+            try {
+                if(!ENCRYPTED_USERS) {
+                    msg.innerText = "Lỗi: Bài thi chưa được nhúng dữ liệu học sinh (Chưa tải từ Generator)!";
+                    return;
+                }
+                
+                // Giải mã danh sách học sinh
+                const users = JSON.parse(decodeURIComponent(atob(ENCRYPTED_USERS)));
+                
+                // Tìm kiếm thông tin học sinh ở môi trường cục bộ (so sánh id và pass)
+                const user = users.find(u => u.id == id && u.password == pass); // Đổi 'password' thành key phù hợp với Sheet của bạn
+                
+                if(user) {
+                    currentStudent.id = id; 
+                    currentStudent.name = user.name;
+                    document.getElementById('login-modal').style.display = 'none';
+                    
+                    // --- THÊM PHẦN HỎI VÀ HIỂN THỊ TÊN Ở ĐÂY ---
+                    // Hỏi xác nhận họ tên (Gợi ý sẵn tên lấy từ GG Sheet)
+                    const confirmedName = prompt("Vui lòng xác nhận Họ Tên của bạn để hiển thị trên bài làm:", currentStudent.name) || currentStudent.name;
+                    currentStudent.name = confirmedName; // Cập nhật lại nếu hs sửa
+                    
+                    // Hiển thị tên với viền RGB và Nút tải
+                    document.getElementById('student-name-display').innerHTML = "Học sinh: " + currentStudent.name + " - ID: " + currentStudent.id;
+                    document.getElementById('student-info-container').style.display = 'block';
+                    document.getElementById('btn-download-html').style.display = 'block';
+                    // -------------------------------------------
+
+                    quizData.forEach((sec, sIdx) => sectionStartTimes[sIdx] = Date.now());
+                    startHeartbeat(id);
+                } else { 
+                    msg.innerText = "Sai Mã học sinh hoặc Mật khẩu!"; 
+                }
+            } catch(e) { 
+                msg.innerText = "Lỗi hệ thống khi đăng nhập!"; 
+            }
+        }
+		
+		// ==========================================
+        // HỆ THỐNG TRACKING & CHỐNG GIAN LẬN
+        // ==========================================
+        function startHeartbeat(studentId) {
+            setInterval(function() {
+                const formData = new URLSearchParams();
+                formData.append('action', 'ping');
+                formData.append('id', studentId);
+                formData.append('status', getRealStatus()); 
+                fetch(GAS_URL, { method: "POST", body: formData })
+                .catch(err => console.log("Lỗi ping:", err));
+            }, 60000); 
+        }
+
+        window.addEventListener('beforeunload', function () {
+            if (typeof currentStudent !== 'undefined' && currentStudent.id) {
+                const formData = new FormData();
+                formData.append('action', 'ping');
+                formData.append('id', currentStudent.id);
+                formData.append('status', 'Mất kết nối (Thoát trang)');
+                navigator.sendBeacon(GAS_URL, formData);
+            }
+        });
+
+        function getRealStatus() {
+            // Tinh chỉnh riêng cho trang Toán 12: Kiểm tra trạng thái các nút nộp bài
+            const submitBtns = document.querySelectorAll('.btn-submit-section');
+            if (submitBtns.length === 0) return "Đang làm bài";
+            
+            let allSubmitted = true;
+            let submittedCount = 0;
+            
+            submitBtns.forEach(btn => {
+                if (btn.innerText !== "ĐÃ LƯU ĐIỂM") {
+                    allSubmitted = false;
+                } else {
+                    submittedCount++;
+                }
+            });
+
+            if (allSubmitted) return "Đã nộp xong tất cả (Đang xem giải thích)";
+            if (submittedCount > 0) return `Đã nộp ${submittedCount}/${submitBtns.length} chuyên đề`;
+            
+            return "Đang làm bài";
+        }
+
+        let tabSwitchTimeout;
+        let hasSentTabSwitchSignal = false; 
+
+        document.addEventListener("visibilitychange", function() {
+            if (typeof currentStudent !== 'undefined' && currentStudent.id) {
+                if (document.hidden) {
+                    tabSwitchTimeout = setTimeout(function() {
+                        hasSentTabSwitchSignal = true; 
+                        const formData = new FormData();
+                        formData.append('action', 'ping');
+                        formData.append('id', currentStudent.id);
+                        formData.append('status', '⚠️ ĐANG LƯỚT TAB KHÁC (Quá 1 phút)!');
+                        navigator.sendBeacon(GAS_URL, formData);
+                    }, 60000); 
+                } else {
+                    clearTimeout(tabSwitchTimeout);
+                    if (hasSentTabSwitchSignal) {
+                        let currentStatus = getRealStatus();
+                        const formData = new FormData();
+                        formData.append('action', 'ping');
+                        formData.append('id', currentStudent.id);
+                        formData.append('status', currentStatus);
+                        navigator.sendBeacon(GAS_URL, formData);
+                        hasSentTabSwitchSignal = false; 
+                    }
+                }
+            }
+        });
+
+        async function sendReportToSheet(score, total, timeSpent, testName, submitBtn) {
+            submitBtn.innerText = "ĐANG GỬI DỮ LIỆU..."; submitBtn.disabled = true;
+            const formData = new URLSearchParams();
+            formData.append('action', 'submitReport'); formData.append('id', currentStudent.id);
+            formData.append('name', currentStudent.name); formData.append('testName', testName);
+            formData.append('score', score + "/" + total); formData.append('time', timeSpent + " giây");
+            formData.append('details', "Đã nộp bài"); formData.append('note', 'Toán');
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: formData });
+                alert(`Lưu điểm phần "${testName}" thành công! (${score}/${total})`);
+                submitBtn.innerText = "ĐÃ LƯU ĐIỂM"; submitBtn.style.background = "#27ae60";
+            } catch(e) {
+                alert("Lỗi khi gửi kết quả! Hãy chụp màn hình lại.");
+                submitBtn.innerText = "LỖI - THỬ LẠI"; submitBtn.disabled = false;
+            }
+        }
+
+        window.submitSection = function(sIdx, btnId) {
+            const btn = document.getElementById(btnId);
+            const sec = quizData[sIdx];
+            let score = 0, totalItems = 0;
+            
+            sec.questions.forEach((q, qIdx) => {
+                const id = sIdx + '_' + qIdx;
+                if (q.qType === "1") {
+                    totalItems++;
+                    const selected = document.querySelector(`input[name="q${id}"]:checked`);
+                    if(selected && selected.value === q.correct) score++;
+                } else if (q.qType === "2") {
+                    totalItems += 4;
+                    ['A','B','C','D'].forEach(opt => {
+                        const selected = document.querySelector(`input[name="q${id}_${opt}"]:checked`);
+                        if(selected && selected.value === q.correct[opt]) score++;
+                    });
+                } else if (q.qType === "3") {
+                    totalItems++;
+                    const input = document.getElementById(`q${id}_sa`);
+                    if(input) {
+                        const userAns = input.value.trim().toLowerCase();
+                        const correctVals = q.correct.split(';').map(v => v.trim().toLowerCase());
+                        if (correctVals.includes(userAns)) score++;
+                    }
+                }
+            });
+            
+            let timeSpent = sectionStartTimes[sIdx] ? Math.floor((Date.now() - sectionStartTimes[sIdx]) / 1000) : 0;
+            sendReportToSheet(score, totalItems, timeSpent, sec.title, btn);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            let html = "";
+
+            quizData.forEach((sec, sIdx) => {
+                html += `<h2 class="section-header">${sec.title}</h2>`;
+                sec.questions.forEach((q, qIdx) => {
+                    const id = sIdx + '_' + qIdx;
+                    html += `<div class="question-box" id="qBox_${id}">
+                                <div class="q-text">${q.qText}</div>`;
+                    if (q.image) html += `<img src="${q.image}" style="max-width:100%; border-radius:4px; margin-bottom:15px;">`;
+                    
+                    // Nâng cấp HTML Type 1 & 2 với class mới
+                    if (q.qType === "1") {
+                        html += `<div class="options-grid">
+                            <label class="option-label" id="lbl_${id}_A"><input type="radio" name="q${id}" value="A"><span class="opt-letter">A</span> ${q.options.A}</label>
+                            <label class="option-label" id="lbl_${id}_B"><input type="radio" name="q${id}" value="B"><span class="opt-letter">B</span> ${q.options.B}</label>
+                            <label class="option-label" id="lbl_${id}_C"><input type="radio" name="q${id}" value="C"><span class="opt-letter">C</span> ${q.options.C}</label>
+                            <label class="option-label" id="lbl_${id}_D"><input type="radio" name="q${id}" value="D"><span class="opt-letter">D</span> ${q.options.D}</label>
+                        </div>`;
+                    } else if (q.qType === "2") {
+                        html += `<table class="tf-table">
+                            <tr><th>Mệnh đề</th><th width="80px">Đúng</th><th width="80px">Sai</th></tr>
+                            ${['A','B','C','D'].map(opt => `
+                            <tr>
+                                <td><span class="opt-letter-tf">${opt}</span> ${q.options[opt]}</td>
+                                <td class="tf-cell-center" id="td_${id}_${opt}_D">
+                                    <label class="tf-radio-label"><input type="radio" name="q${id}_${opt}" value="Đ"><span class="tf-btn">Đ</span></label>
+                                </td>
+                                <td class="tf-cell-center" id="td_${id}_${opt}_S">
+                                    <label class="tf-radio-label"><input type="radio" name="q${id}_${opt}" value="S"><span class="tf-btn">S</span></label>
+                                </td>
+                            </tr>`).join('')}
+                        </table>`;
+                    } else if (q.qType === "3") {
+                        html += `<div><input type="text" id="q${id}_sa" class="sa-input" placeholder="Nhập câu trả lời của bạn vào đây..."></div>`;
+                    }
+
+                    html += `<div class="actions">
+                                <button class="btn-check" onclick="checkAnswer(${sIdx}, ${qIdx})">Kiểm tra ngay</button>
+                                <button class="btn-key" id="btnKey_${id}" onclick="showKey(${sIdx}, ${qIdx})">Xem Lời Giải</button>
+                            </div>
+                            <div class="feedback" id="feedback_${id}"></div>
+                            <div class="explanation-box" id="exp_${id}">${q.explanation}</div>
+                        </div>`;
+                });
+                const btnId = 'submitBtn_' + sIdx;
+                html += `<button id="${btnId}" class="btn-submit-section" onclick="submitSection(${sIdx}, '${btnId}')">NỘP BÀI & LƯU ĐIỂM CHUYÊN ĐỀ NÀY</button><hr style="margin-top:40px;">`;
+            });
+            container.innerHTML = html;
+        }
+
+        window.checkAnswer = function(sIdx, qIdx) {
+            const id = sIdx + '_' + qIdx;
+            const q = quizData[sIdx].questions[qIdx];
+            const feedback = document.getElementById(`feedback_${id}`);
+            document.getElementById(`btnKey_${id}`).style.display = 'inline-block';
+            let isAllCorrect = true;
+
+            if (q.qType === "1") {
+                const selected = document.querySelector(`input[name="q${id}"]:checked`);
+                ['A', 'B', 'C', 'D'].forEach(opt => document.getElementById(`lbl_${id}_${opt}`).className = 'option-label');
+                if (!selected) { isAllCorrect = false; } 
+                else if (selected.value === q.correct) { document.getElementById(`lbl_${id}_${selected.value}`).classList.add('correct'); } 
+                else { document.getElementById(`lbl_${id}_${selected.value}`).classList.add('wrong'); isAllCorrect = false; }
+            } 
+            else if (q.qType === "2") {
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    const selected = document.querySelector(`input[name="q${id}_${opt}"]:checked`);
+                    const tdD = document.getElementById(`td_${id}_${opt}_D`);
+                    const tdS = document.getElementById(`td_${id}_${opt}_S`);
+                    tdD.className = 'tf-cell-center'; tdS.className = 'tf-cell-center';
+                    
+                    if (!selected) { isAllCorrect = false; }
+                    else if (selected.value === q.correct[opt]) {
+                        if(selected.value === 'Đ') tdD.classList.add('tf-correct'); else tdS.classList.add('tf-correct');
+                    } else {
+                        if(selected.value === 'Đ') tdD.classList.add('tf-wrong'); else tdS.classList.add('tf-wrong');
+                        isAllCorrect = false;
+                    }
+                });
+            }
+            else if (q.qType === "3") {
+                const input = document.getElementById(`q${id}_sa`);
+                const userAns = input.value.trim().toLowerCase();
+                const correctVals = q.correct.split(';').map(v => v.trim().toLowerCase());
+                if (!userAns) isAllCorrect = false;
+                else if (correctVals.includes(userAns)) { input.style.borderColor = '#2ecc71'; input.style.backgroundColor = '#d5f5e3'; }
+                else { input.style.borderColor = '#e74c3c'; input.style.backgroundColor = '#fadbd8'; isAllCorrect = false; }
+            }
+
+            feedback.innerHTML = isAllCorrect ? '<span style="color:#2ecc71">Xuất sắc! Bạn chọn đúng hết! 🎉</span>' : '<span style="color:#e74c3c">Có chỗ sai sót, hãy kiểm tra lại.</span>';
+        };
+
+        window.showKey = function(sIdx, qIdx) {
+            const id = sIdx + '_' + qIdx;
+            const q = quizData[sIdx].questions[qIdx];
+            const exp = document.getElementById(`exp_${id}`);
+            
+            let correctText = "";
+            if(q.qType === "1") correctText = `<strong>Đáp án đúng: ${q.correct}</strong><br><br>`;
+            else if(q.qType === "2") correctText = `<strong>Key: A-${q.correct.A} | B-${q.correct.B} | C-${q.correct.C} | D-${q.correct.D}</strong><br><br>`;
+            else if(q.qType === "3") correctText = `<strong>Đáp án được chấp nhận: ${q.correct}</strong><br><br>`;
+
+            exp.innerHTML = correctText + q.explanation;
+            exp.style.display = 'block';
+            if (window.MathJax) MathJax.typesetPromise([exp]);
+        };
+		
+		// ==========================================
+        // HÀM LƯU BÀI LÀM ĐÃ CHẤM THÀNH FILE HTML (FIXED 100%)
+        // ==========================================
+       window.downloadGradedHTML = function() {
+            const btnDownload = document.getElementById('btn-download-html');
+            btnDownload.innerText = "ĐANG TẠO FILE...";
+            
+            // 1. Đồng bộ trạng thái giao diện vào HTML Attributes để giữ nguyên thao tác
+            document.querySelectorAll('input[type="radio"]').forEach(el => {
+                if (el.checked) el.setAttribute('checked', 'checked');
+                else el.removeAttribute('checked');
+            });
+            document.querySelectorAll('input[type="text"]').forEach(el => {
+                el.setAttribute('value', el.value);
+            });
+
+            // 2. Clone toàn bộ mã nguồn hiện tại của trang
+            const clone = document.documentElement.cloneNode(true);
+
+            // 3. Xóa các thành phần không cần thiết ở bản offline
+            const elementsToRemove = ['#login-modal', '#btn-download-html', '.btn-submit-section', '.btn-check'];
+            elementsToRemove.forEach(selector => {
+                clone.querySelectorAll(selector).forEach(el => el.remove());
+            });
+
+            // 4. Khóa toàn bộ input và button (NHƯNG giữ lại nút Xem Lời Giải)
+            clone.querySelectorAll('input, button:not(.btn-key)').forEach(el => el.setAttribute('disabled', 'true'));
+
+            // 5. XỬ LÝ LỖI "RENDER LẠI TỪ ĐẦU" (Dùng replace chuỗi để an toàn tuyệt đối, tránh lỗi regex)
+            clone.querySelectorAll('script').forEach(script => {
+                let code = script.innerHTML;
+                code = code.replace('function renderQuiz() {', 'function renderQuiz() { return; /* Đã chặn render offline */ ');
+                code = code.replace('startHeartbeat(id);', '/* Bản offline: Đã chặn heartbeat */');
+                script.innerHTML = code;
+            });
+
+            // 6. Tạo file và ép trình duyệt tải xuống (Đã xóa ký tự xuống dòng)
+            const htmlContent = "<!DOCTYPE html>" + clone.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Tên file xuất ra chứa toàn bộ bài làm
+            const safeName = currentStudent.name ? currentStudent.name.replace(/\s+/g, '_') : 'Khach';
+            const safeId = currentStudent.id ? currentStudent.id : 'Unknown';
+            a.download = `BaiLam_${safeName}_${safeId}.html`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            btnDownload.innerText = "📥 TẢI BÀI ĐÃ CHẤM";
+        };
+
+        renderQuiz();
+    </script>
+</body>
+</html>
