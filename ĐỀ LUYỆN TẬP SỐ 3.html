@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn thi Đánh giá năng lực ĐHQG TP HCM </title>
+    <script>
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f0f2f5; line-height: 1.6; }
+        h1 { text-align: center; color: #1a237e; }
+        .section-header { color: #e67e22; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 40px; margin-bottom: 20px; }
+        .question-box { background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+        
+        /* Ẩn input radio mặc định */
+        input[type="radio"] { display: none; }
+        
+        /* Trắc nghiệm Format Mới */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .option-label { display: flex; align-items: center; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #fafafa; }
+        .option-label:hover { background: #f1f2f6; }
+        
+        .opt-letter { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 50%; background-color: white; color: #3498db; border: 2px solid #3498db; box-sizing: border-box; font-weight: bold; margin-right: 12px; font-size: 15px; transition: 0.2s; }
+		input[type="radio"]:checked + .opt-letter { background-color: #3498db; color: white; box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2); }
+        .option-label.correct { border-color: #2ecc71; background: #d5f5e3; }
+        .option-label.correct .opt-letter { background-color: #27ae60; }
+        .option-label.wrong { border-color: #e74c3c; background: #fadbd8; }
+        .option-label.wrong .opt-letter { background-color: #e74c3c; }
+        
+        /* Đúng Sai Format Mới */
+        .tf-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .tf-table th, .tf-table td { border: 1px solid #dcdde1; padding: 12px; }
+        .tf-table th { background: #f8f9f9; text-align: center; }
+        .tf-cell-center { text-align: center; }
+        
+        .opt-letter-tf { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; border-radius: 4px; background-color: #34495e; color: white; font-weight: bold; margin-right: 10px; font-size: 14px; }
+        .tf-radio-label { display: block; cursor: pointer; }
+        .tf-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background-color: #ecf0f1; font-weight: bold; color: #7f8c8d; transition: 0.2s; }
+        
+        input[type="radio"][value="Đ"]:checked + .tf-btn { background-color: #2ecc71; color: white; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3); }
+        input[type="radio"][value="S"]:checked + .tf-btn { background-color: #e74c3c; color: white; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3); }
+        .tf-correct .tf-btn { background-color: #27ae60 !important; color: white !important; }
+        .tf-wrong .tf-btn { background-color: #c0392b !important; color: white !important; }
+
+        /* Trả lời ngắn */
+        .sa-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
+        .sa-input:focus { border-color: #3498db; outline: none; }
+        
+        .actions { margin-top: 15px; display: flex; gap: 10px; }
+        button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-check { background: #3498db; }
+        .btn-key { background: #9b59b6; display: none; }
+        .btn-submit-section { background: #e74c3c; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; border-radius: 8px; }
+        .feedback { margin-top: 10px; font-weight: bold; }
+        .explanation-box { display: none; margin-top: 15px; padding: 15px; background: #f8f9f9; border-left: 4px solid #f1c40f; border-radius: 4px; }
+        
+        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; width: 320px; text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px;}
+        .login-box button { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 5px; font-size: 16px;}
+    
+		/* Hiệu ứng RGB cho tên Học sinh */
+        .rgb-wrapper { text-align: center; display: none; margin-bottom: 20px; }
+        .rgb-box {
+            position: relative; padding: 12px 30px; background: #fff;
+            border-radius: 8px; display: inline-block; font-size: 18px;
+            font-weight: bold; color: #1a237e; text-transform: uppercase;
+        }
+        .rgb-box::before {
+            content: ""; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%; border-radius: 12px; z-index: -1;
+            animation: rgb-border 10s linear infinite;
+        }
+        @keyframes rgb-border {
+            0% { background-position: 0 0; } 50% { background-position: 400% 0; } 100% { background-position: 0 0; }
+        }
+
+        /* Nút Tải bài đã chấm */
+        #btn-download-html {
+            position: fixed; bottom: 20px; right: 20px; background: #34495e; color: white;
+            padding: 15px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none; z-index: 999; font-size: 16px; border: 2px solid #ecf0f1; transition: 0.3s;
+        }
+        #btn-download-html:hover { background: #2c3e50; transform: scale(1.05); }
+		
+		.hint-icon { cursor: pointer; font-size: 20px; margin-left: 10px; display: inline-block; transition: transform 0.2s; user-select: none; }
+        .hint-icon:hover { transform: scale(1.2); }
+        .hint-box { display: none; background: #fffdf7; border-left: 4px solid #f1c40f; padding: 15px; margin-top: 15px; border-radius: 4px; font-size: 15px; color: #555; }
+		
+		/* CSS cho Pop-up Gợi ý */
+        #hint-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .hint-modal-content { background: white; padding: 25px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; font-size: 16px; line-height: 1.6; border-top: 5px solid #f1c40f; }
+        .close-hint-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; justify-content: center; align-items: center; }
+		
+		
+	</style>
+</head>
+<body>
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>Đăng Nhập Làm Bài</h2>
+            <input type="text" id="hs-id" placeholder="Mã học sinh (ID)">
+            <input type="password" id="hs-pass" placeholder="Mật khẩu">
+            <button id="btnLogin" onclick="handleLogin()">ĐĂNG NHẬP</button>
+            <div id="login-msg" style="color: #e74c3c; margin-top: 10px;"></div>
+        </div>
+    </div>
+	
+	<div id="hint-modal-overlay" onclick="if(event.target === this) closeHintModal()">
+        <div class="hint-modal-content">
+            <button class="close-hint-btn" onclick="closeHintModal()">×</button>
+            <h3 style="margin-top:0; color:#d35400;">💡 Gợi ý</h3>
+            <div id="hint-modal-body"></div>
+        </div>
+    </div>
+
+    <h1>Ôn thi Đánh giá năng lực ĐHQG TP HCM </h1>
+	<!-- KHUNG HIỂN THỊ TÊN HỌC SINH -->
+    <div class="rgb-wrapper" id="student-info-container">
+        <div class="rgb-box" id="student-name-display"></div>
+    </div>
+    <div id="quizContainer"></div>
+	<!-- NÚT TẢI BÀI -->
+    <button id="btn-download-html" onclick="downloadGradedHTML()">📥 TẢI BÀI ĐÃ CHẤM</button>
+
+    <script>
+        
+        const quizData = [{"title":"PHẦN 3","questions":[{"originalNum":1,"qType":"1","qText":"Câu 1 (NB): Trong các dòng dưới đây, dòng nào chỉ chứa thành ngữ?","context":"","image":null,"options":{"A":"Chị ngã em nâng; Ruột thắt từng cơn","B":"Gà trống nuôi con; Tháng rộng năm dài","C":"Một sương hai nắng; Mình hạc xương mai","D":"Thẳng cánh cò bay; Nước mắt chan hòa"},"correct":"C","explanation":"(NB): Trong các dòng dưới đây, dòng nào chỉ chứa thành ngữ? <br>\tA. Chị ngã em nâng; Ruột thắt từng cơn \tB. Gà trống nuôi con; Tháng rộng năm dài    <br> \tC. Một sương hai nắng; Mình hạc xương mai \tD. Thẳng cánh cò bay; Nước mắt chan hòa <br>Phương pháp giải: <br>Áp dụng kiến thức đã học về thành ngữ.<br>Giải chi tiết: <br>- Thành ngữ là loại cụm từ có cấu tạo cố định, biểu thị một ý nghĩa hoàn chỉnh.<br>- Theo đề:<br>+ Ý A: Cả hai câu đều không phải thành ngữ<br>+ Ý B: “Tháng rộng năm dài” không phải thành ngữ<br>+ Ý D: “Nước mắt chan hòa” không phải thành ngữ","hint":""},{"originalNum":2,"qType":"1","qText":"Câu 2 (NB): Câu thơ nào sau đây không thuộc tác phẩm Việt Nam?","context":"","image":null,"options":{"A":"Mày chau tay gẩy khúc sầu/Giãi bày hết nỗi trước sau muôn vàn.","B":"Dẽ có Ngu Cầm đàn một tiếng/Dân giàu đủ, khắp đòi phương","C":"Mạc vị xuân tàn hoa lạc tận/Đình tiền tạc dạ nhất chi mai.","D":"Rượu, đến cội cây, ta sẽ uống/Nhìn xem phú quý tựa chiêm bao"},"correct":"A","explanation":"(NB): Câu thơ nào sau đây không thuộc tác phẩm Việt Nam? <br>\tA. Mày chau tay gẩy khúc sầu/Giãi bày hết nỗi trước sau muôn vàn. <br>\tB. Dẽ có Ngu Cầm đàn một tiếng/Dân giàu đủ, khắp đòi phương <br>\tC. Mạc vị xuân tàn hoa lạc tận/Đình tiền tạc dạ nhất chi mai. <br>\tD. Rượu, đến cội cây, ta sẽ uống/Nhìn xem phú quý tựa chiêm bao <br>Phương pháp giải: <br>Sử dụng kiến thức phần văn bản THPT<br>Giải chi tiết: <br>+ Ý B: Được trích trong tác phẩm “Cảnh ngày hè” của tác giả Nguyễn Trãi<br>+ Ý C: Được trích trong tác phẩm “Cáo bệnh bảo mọi người” của tác giả Mãn Giác<br>+ Ý D: Được trích trong tác phẩm “Nhàn” của tác giả Nguyễn Bỉnh Khiêm<br>+Ý A: Được trích trong tác phẩm “Tì bà hành” của tác giả Bạch Cư Dị (người tỉnh Thiểm Tây – Trung Quốc. Là nhà thơ nổi tiếng sáng tác rất nhiều tác phẩm thời nhà Đường)","hint":""},{"originalNum":3,"qType":"1","qText":"Câu 3 (NB): Truyện ngắn “Hai đứa trẻ” của Thạch Lam được trích từ tập truyện nào?","context":"","image":null,"options":{"A":"Hoa dọc chiến hào","B":"Nắng trong vườn","C":"Lửa thiêng","D":"Vang bóng một thời"},"correct":"B","explanation":"(NB): Truyện ngắn “Hai đứa trẻ” của Thạch Lam được trích từ tập truyện nào? <br>\tA. Hoa dọc chiến hào \tB. Nắng trong vườn \tC. Lửa thiêng \tD. Vang bóng một thời <br>Phương pháp giải: <br>Sử dụng kiến thức phần tiểu dẫn của các tác phẩm THPT<br>Giải chi tiết: <br>+ Ý A: Tập “Hoa dọc chiến hào” là sáng tác của nhà thơ Xuân Quỳnh<br>+ Ý C: Tập “Lửa thiêng” là sáng tác của nhà thơ Huy Cận<br>+ Ý D: Tập “Vang bóng một thời” là sáng tác của nhà văn Nguyễn Tuân.<br>+ Ý B: “Hai đứa trẻ” là truyện ngắn tiêu biểu của nhà văn Thạch Lam được trích từ tập “Nắng trong vườn”","hint":""},{"originalNum":4,"qType":"1","qText":"Câu 4 (NB): Dòng nào sau đây chỉ chứa từ láy?","context":"","image":null,"options":{"A":"Nhung nhớ, ngân nga.","B":"Mòn mỏi, đỏ đen.","C":"Ngân nga, tươi tốt.","D":"Chiều chiều, quan san."},"correct":"A","explanation":"(NB): Dòng nào sau đây chỉ chứa từ láy? <br>\tA. Nhung nhớ, ngân nga. \tB. Mòn mỏi, đỏ đen. <br>\tC. Ngân nga, tươi tốt. \t\tD. Chiều chiều, quan san. <br>Phương pháp giải: <br>Sử dụng kiến thức bài từ ghép, từ láy.<br>Giải chi tiết: <br>Nhung nhớ, ngân nga => Từ láy.                                                                                          <br>Mòn mỏi, đỏ đen => “đỏ đen” là từ ghép.                             <br>Ngân nga, tươi tốt => “tươi tốt” là từ ghép.                                                                          <br>Chiều chiều, quan san => “quan san” là từ ghép.","hint":""},{"originalNum":5,"qType":"1","qText":"Câu 5 (NB): Từ “Điếu phạt” trong câu “Việc nhân nghĩa cốt ở yên dân/Quân điếu phạt trước lo trừ bạo” (Trích Bình Ngô đại cáo – Nguyễn Trãi) có ý nghĩa gì?","context":"","image":null,"options":{"A":"thương xót dân chúng","B":"Thương dân, đánh kẻ có tội","C":"Dẫn quân đi dẹp loạn","D":"Trừng phạt kẻ thù"},"correct":"B","explanation":"(NB): Từ “Điếu phạt” trong câu “Việc nhân nghĩa cốt ở yên dân/Quân điếu phạt trước lo trừ bạo” (Trích Bình Ngô đại cáo – Nguyễn Trãi) có ý nghĩa gì? <br>\tA. thương xót dân chúng \tB. Thương dân, đánh kẻ có tội <br>\tC. Dẫn quân đi dẹp loạn \tD. Trừng phạt kẻ thù <br>Phương pháp giải: <br>Vận dụng kiến thức của tác phẩm Bình Ngô đại cáo của Nguyễn Trãi<br>Giải chi tiết: <br>Điếu phạt: Điếu là thương xót, phạt là trừng phạt kẻ có tội. Hai chữ điếu phạt được rút gọn từ điếu dân phạt tội tức là thương dân đánh kẻ có tội.","hint":""},{"originalNum":6,"qType":"1","qText":"Câu 6 (NB): Trong tác phẩm “Ai đã đặt tên cho dòng sông” của tác giả Hoàng Phủ Ngọc Tường, con sông Hương được miêu tả như thế nào ở đoạn thượng nguồn?","context":"","image":null,"options":{"A":"Như một cô gái Digan phóng khoáng và man dại","B":"Như một người mẹ phù sa của một vùng văn hóa xứ sở.","C":"Như người gái đẹp nằm ngủ mơ màng giữa cánh đồng Châu Hóa đầy hoa dại","D":"Như người tài nữ đánh đàn lúc đêm khuya"},"correct":"A","explanation":"(NB): Trong tác phẩm “Ai đã đặt tên cho dòng sông” của tác giả Hoàng Phủ Ngọc Tường, con sông Hương được miêu tả như thế nào ở đoạn thượng nguồn? <br>\tA. Như một cô gái Digan phóng khoáng và man dại <br>\tB. Như một người mẹ phù sa của một vùng văn hóa xứ sở. <br>\tC. Như người gái đẹp nằm ngủ mơ màng giữa cánh đồng Châu Hóa đầy hoa dại <br>\tD. Như người tài nữ đánh đàn lúc đêm khuya <br>Phương pháp giải: <br>Sử dụng kiến thức tác phẩm “Ai đã đặt tên cho dòng sông” của Hoàng Phủ Ngọc Tường.<br>Giải chi tiết: <br>Hình ảnh cô gái Di-gan là hình ảnh tượng trưng cho vẻ đẹp của sông Hương khi chảy ở đoạn thượng nguồn. “Giữa lòng Trường Sơn, sông Hương đã sống một nữa cuộc đời mình như một cô gái Di-gan phóng khoáng và man dại. Rừng già đã hun đúc cho nó một bản lĩnh gan dạ, một tâm hồn tự do và trong sáng”.","hint":""},{"originalNum":7,"qType":"1","qText":"Câu 7 (TH): Chi tiết “lá ngón” xuất hiện lần thứ hai trong tác phẩm “Vợ chồng A Phủ” mang ý nghĩa gì?","context":"","image":null,"options":{"A":"Thể hiện khát vọng tự do của nhân vật Mị","B":"Thể hiện sự thức tỉnh trong tâm hồn Mị","C":"Thể hiện sự tê liệt về mặt tinh thần của nhân vật Mị","D":"Thể hiện sự phản kháng của nhân vật Mị"},"correct":"C","explanation":"(TH): Chi tiết “lá ngón” xuất hiện lần thứ hai trong tác phẩm “Vợ chồng A Phủ” mang ý nghĩa gì? <br>\tA. Thể hiện khát vọng tự do của nhân vật Mị <br>\tB. Thể hiện sự thức tỉnh trong tâm hồn Mị <br>\tC. Thể hiện sự tê liệt về mặt tinh thần của nhân vật Mị <br>\tD. Thể hiện sự phản kháng của nhân vật Mị <br>Phương pháp giải: <br>Vận dụng kiến thức về mặt nội dung của tác phẩm “Vợ chồng A Phủ” của nhà văn Tô Hoài.<br>Giải chi tiết: <br>Hình ảnh chiếc lá ngón xuất hiện lần thứ hai là trong thời gian Mị làm dâu nhà thống lý. Mấy năm qua, bố Mị đã chết nhưng cô không còn ý định ăn lá ngón tự tử nữa. Sống lâu trong cái khổ Mị quen rồi. Khi không còn ý định tự tử nghĩa là không còn ý thức được cái khổ của bản thân. Mị đã tê liệt về tinh thần.","hint":""},{"originalNum":8,"qType":"1","qText":"Câu 8 (TH): Cảnh Đèo Ngang trong tác phẩm “Qua Đèo Ngang” (Bà huyện thanh quan) được miêu tả vào thời gian nào?","context":"","image":null,"options":{"A":"Sáng sớm","B":"Xế trưa","C":"Chiều tà","D":"Đêm khuya"},"correct":"C","explanation":"(TH): Cảnh Đèo Ngang trong tác phẩm “Qua Đèo Ngang” (Bà huyện thanh quan) được miêu tả vào thời gian nào? <br>\tA. Sáng sớm \tB. Xế trưa \tC. Chiều tà \tD. Đêm khuya <br>Phương pháp giải: <br>Vận dụng kiến thức tác phẩm Qua Đèo Ngang<br>Giải chi tiết: <br>Cảnh Đèo Ngang được miêu tả vào khi chiều tà được thể hiện qua câu thơ “Bước tới đèo ngang bóng xế tà”","hint":""},{"originalNum":9,"qType":"1","qText":"Câu 9 (VD): Cặp quan hệ từ “càng…..càng” trong câu “Càng nhìn lại càng ngẩn ngơ/Ôm hôn ảnh Bác mà ngờ Bác hôn” (Thanh Hải) biểu thị mối quan hệ gì?","context":"","image":null,"options":{"A":"Nhân – quả","B":"Đối lập","C":"So sánh","D":"Tăng tiến"},"correct":"D","explanation":"(VD): Cặp quan hệ từ “càng…..càng” trong câu “Càng nhìn lại càng ngẩn ngơ/Ôm hôn ảnh Bác mà ngờ Bác hôn” (Thanh Hải) biểu thị mối quan hệ gì? <br>\tA. Nhân – quả \tB. Đối lập \tC. So sánh \tD. Tăng tiến <br>Phương pháp giải: <br>Vận dụng kiến thức về quan hệ từ<br>Giải chi tiết: <br>Cặp quan hệ từ càng – càng trong câu thể hiện mối quan hẹ tăng tiến. Mạch cảm xúc của tác giả ngày càng dâng trào sâu sắc hơn khi thấy ảnh Bác Hồ","hint":""},{"originalNum":10,"qType":"1","qText":"Câu 10 (VD): Trong câu “Trên những nương cao, mạch ba góc mùa thu chín đỏ sậm” (Trích Vùng biên ải, Ma Văn Kháng) đâu là thành phần trạng ngữ?","context":"","image":null,"options":{"A":"Trên những nương cao","B":"Mạch ba góc","C":"Mùa thu","D":"Chín đỏ sậm"},"correct":"A","explanation":"(VD): Trong câu “Trên những nương cao, mạch ba góc mùa thu chín đỏ sậm” (Trích Vùng biên ải, Ma Văn Kháng) đâu là thành phần trạng ngữ? <br>\tA. Trên những nương cao \tB. Mạch ba góc <br>\tC. Mùa thu \t\tD. Chín đỏ sậm <br>Phương pháp giải: <br>Vận dụng kiến thức về trạng ngữ<br>Giải chi tiết: <br>- Trạng ngữ là thành phần phụ của câu, bổ sung ý nghĩa cho nòng cốt câu.<br>- Trên nương cao là trạng ngữ chỉ nơi trốn.<br>Trong câu “Trên những nương cao, mạch ba góc mùa thu chín đỏ sậm” (Trích Vùng biên ải, Ma Văn Kháng) đâu là thành phần trạng ngữ?","hint":""},{"originalNum":11,"qType":"1","qText":"Câu 11 (NB): Chọn một từ để điền vào chỗ trống trong câu ca dao sau: “Hoa lài, hoa lựu, hoa ngâu/ Sao bằng hoa bưởi thơm….dịu dàng”","context":"","image":null,"options":{"A":"Thơm","B":"Xanh","C":"Tươi","D":"Lâu"},"correct":"D","explanation":"(NB): Chọn một từ để điền vào chỗ trống trong câu ca dao sau: “Hoa lài, hoa lựu, hoa ngâu/ Sao bằng hoa bưởi thơm….dịu dàng” <br>\tA. Thơm \tB. Xanh \tC. Tươi \tD. Lâu <br>Phương pháp giải: <br>Kiến thức về ca dao dân ca<br>Giải chi tiết: <br>Câu ca dao: “Hoa lài, hoa lựu, hoa ngâu/ Sao bằng hoa bưởi thơm lâu dịu dàng”","hint":""},{"originalNum":12,"qType":"1","qText":"Câu 12 (NB): Dòng nào sau đây không bao gồm các từ đồng nghĩa","context":"","image":null,"options":{"A":"To, lớn, vĩ đại, khổng lồ","B":"Bé, con con, tí hon","C":"Cao, lộc ngộc, lòng khòng","D":"Thấp, nhỏ nhắn, nhỏ nhen"},"correct":"D","explanation":"(NB): Dòng nào sau đây không bao gồm các từ đồng nghĩa <br>\tA. To, lớn, vĩ đại, khổng lồ \tB. Bé, con con, tí hon <br>\tC. Cao, lộc ngộc, lòng khòng \tD. Thấp, nhỏ nhắn, nhỏ nhen <br>Phương pháp giải: <br>Vận dụng kiến thức về từ đồng nghĩa<br>Giải chi tiết: <br>-Trong các từ ở ý D, từ nhỏ nhen mang nghĩa khác với hai từ còn lại.<br>- Thấp, nhỏ nhắn là các từ mang ý nghĩa chỉ hình dáng; Nhỏ nhen là từ mang ý nghĩa chỉ tính cách.","hint":""},{"originalNum":13,"qType":"1","qText":"Câu 13 (NB): Câu nghi vấn “Ai dám bảo thảo mộc tự nhiên không có tình mẫu tử?” (Trích Lũy làng, Ngô Văn Phú) dùng để làm gì?","context":"","image":null,"options":{"A":"Hỏi","B":"Khẳng định","C":"Phủ định","D":"Cầu khiến"},"correct":"B","explanation":"(NB): Câu nghi vấn “Ai dám bảo thảo mộc tự nhiên không có tình mẫu tử?” (Trích Lũy làng, Ngô Văn Phú) dùng để làm gì? <br>\tA. Hỏi \tB. Khẳng định \tC. Phủ định \tD. Cầu khiến <br>Phương pháp giải: <br>Kiến thức câu nghi vấn<br>Giải chi tiết: <br>Mục đích câu nghi vấn trên dùng để khẳng định tình mẫu tử của thảo mộc (măng tre)","hint":""},{"originalNum":14,"qType":"1","qText":"Câu 14 (TH): Từ “Phòng” trong câu thơ “Ta nghe hè dậy bên lòng/Mà chân muốn đạp tan phòng, hè ôi!” trích từ tác phẩm “Khi con tu hú” của Tố Hữu là chỉ không gian nào?","context":"","image":null,"options":{"A":"Nơi tác giả sinh sống","B":"Nơi tác giả làm việc","C":"Nơi tác giả bị giam giữ","D":"Nơi tác giả nghỉ ngơi"},"correct":"C","explanation":"(TH): Từ “Phòng” trong câu thơ “Ta nghe hè dậy bên lòng/Mà chân muốn đạp tan phòng, hè ôi!” trích từ tác phẩm “Khi con tu hú” của Tố Hữu là chỉ không gian nào? <br>\tA. Nơi tác giả sinh sống \tB. Nơi tác giả làm việc <br>\tC. Nơi tác giả bị giam giữ \tD. Nơi tác giả nghỉ ngơi <br>Phương pháp giải: <br>vận dụng kiến thức trong bài thơ “Khi con tu hú “ của Tố Hữu<br>Giải chi tiết: <br>“Khi con tu hú” là tác phẩm thể hiện lòng yêu cuộc sống, khát khao tự do cháy bỏng của người chiến sĩ cách mạng đang trong cảnh tù đày. Từ phòng trong câu thơ ám chỉ phòng giam nơi tác giả đang bị giam giữ.","hint":""},{"originalNum":15,"qType":"1","qText":"Câu 15 (NB): Trong các câu sau:<br> I. Con sông hiền hòa mang một vẻ đẹp vô cùng lãng mạng. <br> II. Cô gái im lặng rồi sau đó trả lời bằng một cái giọng ráo hoảnh. <br> III. Bà lão lật đật trở về với vẻ mặt băn khoăn. <br> IV. Có vẻ như một tương lai sáng lạng đang đón chờ thằng bé ở phía trước con đường.<br>Những câu nào mắc lỗi:","context":"","image":null,"options":{"A":"I và IV","B":"II và III","C":"I và II","D":"I và III"},"correct":"A","explanation":"(NB): Trong các câu sau:<br> I. Con sông hiền hòa mang một vẻ đẹp vô cùng lãng mạng. <br> II. Cô gái im lặng rồi sau đó trả lời bằng một cái giọng ráo hoảnh. <br> III. Bà lão lật đật trở về với vẻ mặt băn khoăn. <br> IV. Có vẻ như một tương lai sáng lạng đang đón chờ thằng bé ở phía trước con đường.<br>Những câu nào mắc lỗi: <br>\tA. I và IV \tB. II và III \tC. I và II \tD. I và III <br>Phương pháp giải: <br>Vận dụng kiến thức chữa lỗi dùng từ<br>Giải chi tiết: <br>I. Từ dùng sai “lãng mạng”. Chữa lại: Lãng mạn<br>IV. Từ dùng sai “sáng lạng”. Chữa lại: “Xán lạn”","hint":""},{"originalNum":16,"qType":"1","qText":"Câu 16 (NB): Đoạn trích trên được viết theo phong cách ngôn ngữ nào?","context":"Đọc đoạn trích sau và thực hiện các câu hỏi từ câu 16 đến câu 20:<br>Ai cũng biết Hàn Quốc phát triển kinh tế khá nhanh, vào loại “con rồng nhỏ” có quan hệ khá chặt chẽ với các nước phương Tây, một nền kinh tế thị trường nhộn nhịp, có quan hệ quốc tế rộng rãi. Khắp nơi đều có quảng cáo, nhưng không bao giờ quảng cáo thương mại được đặt ở những nơi công sở, hội trường lớn, danh lam thắng cảnh. Chữ nước ngoài, chủ yếu là tiếng Anh, nếu có thì viết nhỏ đặt dưới chữ Triều Tiên to hơn ở phía trên. Đi đâu, nhìn đâu cũng thấy nổi bật những bảng hiệu chữ Triều Tiên. Trong khi đó thì ở một vài thành phố của ta nhìn vào đâu cũng thấy tiếng Anh, có bảng hiệu của các cơ sở của ta hẳn hoi mà chữ nước ngoài lại lớn hơn cả chữ Việt, có lúc ngỡ ngàng tưởng như mình lạc sang một nước khác.<br>(Chữ ta, bài xã luận Bản lĩnh Việt Nam của Hữu Thọ)<br><br>","image":null,"options":{"A":"Sinh hoạt.","B":"Nghệ thuật.","C":"Báo chí.","D":"Chính luận."},"correct":"D","explanation":"(NB): Đoạn trích trên được viết theo phong cách ngôn ngữ nào? <br>\tA. Sinh hoạt. \tB. Nghệ thuật. \tC. Báo chí. \tD. Chính luận. <br>Phương pháp giải: <br>Căn cứ vào các phong cách ngôn ngữ đã học: sinh hoạt, nghệ thuật, báo chí, chính luận, hành chính.<br>Giải chi tiết: <br>Đoạn trích trên được trích trong một bài xã luận với phong cách ngôn ngữ chính luận (Là ngôn ngữ dùng trong các văn bản chính luận hoặc lời nói miệng trong các buổi hội nghị, hội thảo, nói chuyện thời sự,… nhằm trình bày, bình luận, đánh giá những sự kiện, những vấn đề về chính trị, xã hội, văn hóa, tư tưởng,..).","hint":""},{"originalNum":17,"qType":"1","qText":"Câu 17 (NB): Đoạn văn trên sử dụng phương pháp lập luận chính nào?","context":"","image":null,"options":{"A":"So sánh.","B":"Phân tích.","C":"Bác bỏ.","D":"Bình luận."},"correct":"A","explanation":"(NB): Đoạn văn trên sử dụng phương pháp lập luận chính nào? <br>\tA. So sánh. \tB. Phân tích. \tC. Bác bỏ. \tD. Bình luận. <br>Phương pháp giải: <br>Căn cứ vào các phương pháp lập luận đã học: giải thích, so sánh, phân tích, bình luận, bác bỏ.<br>Giải chi tiết: <br>Phương pháp lập luận: So sánh.<br>Tác giả đưa ra các hiện tượng sử dụng ngôn ngữ trên bảng hiệu ở Hàn Quốc và Việt Nam.","hint":""},{"originalNum":18,"qType":"1","qText":"Câu 18 (TH): Tác giả muốn nêu lên điều gì về việc sử dụng quảng cáo của người Hàn Quốc và tình trạng quảng cáo ở Việt Nam?","context":"","image":null,"options":{"A":"Hàn Quốc là một đất nước phát triển nhưng còn tư duy bảo thủ chưa hội nhập.","B":"Việt Nam tiếp thu rất nhanh nền văn hóa tiên tiến.","C":"Tư duy sính ngoại rất phổ biến ở Việt Nam đang là mất đi giá trị tiếng nói dân tộc.","D":"Việc sử dụng ngôn ngữ nước ngoài ở một vài tỉnh thành nước ta khiến tác giả cảm thấy ngỡ ngàng như bước sang một thế giới khác."},"correct":"C","explanation":"(TH): Tác giả muốn nêu lên điều gì về việc sử dụng quảng cáo của người Hàn Quốc và tình trạng quảng cáo ở Việt Nam? <br>\tA. Hàn Quốc là một đất nước phát triển nhưng còn tư duy bảo thủ chưa hội nhập. <br>\tB. Việt Nam tiếp thu rất nhanh nền văn hóa tiên tiến. <br>\tC. Tư duy sính ngoại rất phổ biến ở Việt Nam đang là mất đi giá trị tiếng nói dân tộc. <br>\tD. Việc sử dụng ngôn ngữ nước ngoài ở một vài tỉnh thành nước ta khiến tác giả cảm thấy ngỡ ngàng như bước sang một thế giới khác. <br>Phương pháp giải: <br>Đọc, phân tích, tổng hợp.<br>Giải chi tiết: <br>Tác giả muốn nói rằng ở Hàn Quốc họ ưu tiên sử dụng ngôn ngữ của quốc gia mình còn ở Việt Nam thì sính ngôn ngữ ngoại. Điều này ở hai quốc gia là trái ngược nhau và tình trạng sính ngôn ngữ ngoại ở Việt Nam rất phổ biến, điều này làm mất đi giá trị của tiếng nói dân tộc.","hint":""},{"originalNum":19,"qType":"1","qText":"Câu 19 (TH): Cụm từ “con rồng nhỏ” trong câu văn Ai cũng biết Hàn Quốc phát triển kinh tế khá nhanh, vào loại “con rồng nhỏ” có quan hệ khá chặt chẽ với các nước phương Tây, một nền kinh tế thị trường nhộn nhịp, có quan hệ quốc tế rộng rãi\" sử dụng biện pháp tu từ cú pháp nào?","context":"","image":null,"options":{"A":"Phép lặp.","B":"Liệt kê.","C":"Ẩn dụ.","D":"Chơi chữ."},"correct":"B","explanation":"(TH): Cụm từ “con rồng nhỏ” trong câu văn Ai cũng biết Hàn Quốc phát triển kinh tế khá nhanh, vào loại “con rồng nhỏ” có quan hệ khá chặt chẽ với các nước phương Tây, một nền kinh tế thị trường nhộn nhịp, có quan hệ quốc tế rộng rãi\" sử dụng biện pháp tu từ cú pháp nào? <br>\tA. Phép lặp. \tB. Liệt kê. \tC. Ẩn dụ. \tD. Chơi chữ. <br>Phương pháp giải: <br>Vận dụng kiến thức về biện pháp tu từ kết hợp với nội dung câu văn.<br>Giải chi tiết: <br>- Ẩn dụ là gọi tên sự vật hiện tượng này bằng tên sự vật hiện tượng khác có nét tương đồng.<br>- Con rồng nhỏ là ám chỉ một nên kinh tế mới phát triển nhưng rất mạnh mẽ và có tiềm lực.","hint":""},{"originalNum":20,"qType":"1","qText":"Câu 20 (TH): Nội dung chính của đoạn trích trên là gì?","context":"","image":null,"options":{"A":"Hiện tượng các biển hiệu in chữ nước ngoài quá nhiều tại Việt Nam.","B":"Thực trạng in biển hiệu chữ nước ngoài tại Việt Nam qua đó thể hiện sự phê phán đối với hiện tượng lạm dụng tiếng nước ngoài và không coi trọng tiếng Việt.","C":"Chỉ ra điểm khác biệt giữa cách sử dụng ngôn ngữ của Hàn Quốc và Việt Nam.","D":"Tình trạng in biển quảng cáo ở các nước hiện nay."},"correct":"B","explanation":"(TH): Nội dung chính của đoạn trích trên là gì? <br>\tA. Hiện tượng các biển hiệu in chữ nước ngoài quá nhiều tại Việt Nam. <br>\tB. Thực trạng in biển hiệu chữ nước ngoài tại Việt Nam qua đó thể hiện sự phê phán đối với hiện tượng lạm dụng tiếng nước ngoài và không coi trọng tiếng Việt. <br>\tC. Chỉ ra điểm khác biệt giữa cách sử dụng ngôn ngữ của Hàn Quốc và Việt Nam. <br>\tD. Tình trạng in biển quảng cáo ở các nước hiện nay. <br>Phương pháp giải: <br>Đọc, phân tích, tổng hợp.<br>Giải chi tiết: <br>Nội dung chính của đoạn trích: Hiện tượng các biển hiệu in chữ nước ngoài quá nhiều tại Việt Nam. Bày tỏ sự phê phán đối với hiện tượng lạm dụng tiếng nước ngoài và không coi trọng tiếng Việt.","hint":""}]}];
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyKTElQukk21DQRGAXuUcxyEePPnVeZlY0qmwvK-NdnGS47vIBcELK2eM5_9rp-V5eo-A/exec";
+        
+        // Nhúng dữ liệu đã mã hóa từ Generator vào file
+        const ENCRYPTED_USERS = "JTVCJTdCJTIyaWQlMjIlM0ElMjJodW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIySCVDMyVCOW5nJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuaHUlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIdSVFMSVCQiVCM25oJTIwTmglQzYlQjAlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnF1eW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUXUlRTElQkIlQjNuaCUyMEwlQzMlQUElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgxJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyME5ndXklRTElQkIlODVuJTIwRHUlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm5nb2MxJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwTmd1eSVFMSVCQiU4NW4lMjBEdSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydnklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJNYWklMjBWeSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmd1eWV0YW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmd1eSVFMSVCQiU4N3QlMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtoYW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQiVFMSVCQSVBM28lMjBLaGFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaG9haWFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwaSUyMEFuaCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyZ2lhbmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIJUM2JUIwJUM2JUExbmclMjBHaWFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdvYzIlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOZyVFMSVCQiU4RGMlMjBFYWthciUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGhhb2FuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRoJUUxJUJBJUEzbyUyMEFuaCUyMEVha2FyJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJsdXUlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJMJUM2JUIwdSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdvY2hhJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwSCVDMyVBMCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdhbjElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIbyVDMyVBMG5nJTIwTmclQzMlQTJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ2FuMiUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglQzMlQTAlMjBOZyVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgyJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyMEdpYSUyME5naCVDNCVBOWElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgzJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyMEhDTSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybWFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyVHJpJUUxJUJCJTg3dSUyME0lRTElQkElQUJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJkdW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUGglQzMlQkElMjBEJUM1JUE5bmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmR1eWVuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTSVFMSVCQiVCOSUyMER1eSVDMyVBQW4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxhbSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkIlOTNuZyUyMEwlQzMlQTJtJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0YW0lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUciVFMSVCQSVBN24lMjBUJUMzJUEybSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmh1bmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVFMSVCQSVBMW0lMjBOaHVuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyYW4lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJBbiUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJpJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmd1eSVFMSVCQiU4NW4lMjBWaSVFMSVCQSVCRnQlMjBUciVDMyVBRCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydmklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUcmklRTElQkIlODd1JTIwVmklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnRpbmglMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUJUUxJUJCJUFCJTIwSCVFMSVCQiVBRnUlMjBUJUUxJUJCJTg5bmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyaSVFMSVCQiU4N3UlMjAlQzMlODJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0aGFuZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyJUUxJUJBJUE3biUyMCVDNCU5MGluaCUyMEMlQzMlQjRuZyUyMFRoJUUxJUJBJUFGbmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtpZXQlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjIlQzQlOTBvJUMzJUEwbiUyMFQlRTElQkElQTVuJTIwS2klRTElQkIlODd0JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJhdSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkElQTNpJTIwJUMzJTgydSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIycXVhbiUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMk1pbmglMjBRdSVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmJhbyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMiVDNCU5MCVFMSVCQiVBOWMlMjBCJUUxJUJBJUEzbyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJhbmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUaHUlMjBUcmFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJpMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRoYW5oJTIwVHIlQzMlQUQlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnRoYW8lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVDNiVCMCVDNiVBMW5nJTIwVGglRTElQkElQTNvJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJkdW9uZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMk5oJUUxJUJBJUFEdCUyMEQlQzYlQjAlQzYlQTFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaHVuZzElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIJUMzJUI5bmclMjBQaG9uZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmh1MSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkdpYSUyME5odSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIycGh1b25nYW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUM2JUIwJUM2JUExbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnV5ZW4lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjElMjIlMkMlMjJuYW1lJTIyJTNBJTIyVXklQzMlQUFuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJob2FuZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtoYW5nMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMktoYW5nJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJraG9pJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyS2glQzMlQjRpJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0cmlldSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkwlQzMlQUElMjBRdSVFMSVCQiU5MWMlMjBUcmklRTElQkIlODd1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJodXklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUciVFMSVCQSVBN24lMjBIdXklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm1pbmglMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOaCVFMSVCQSVBRHQlMjBNaW5oJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJjaGF1JTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQ2glQzMlQTJ1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ2ElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOZ2ElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmRhaSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyJUUxJUJCJThEbmclMjAlQzQlOTAlRTElQkElQTFpJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJodXklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJHaWElMjBIdXklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmR1YyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMk1pbmglMjAlQzQlOTAlRTElQkIlQTljJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJxdXluaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMk5ndXklRTElQkIlODVuJTIwTmglQzYlQjAlMjBRdSVFMSVCQiVCM25oJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ29jJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIySCVDMyVBMCUyMEglRTElQkElQTNpJTIwTmclRTElQkIlOERjJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJueW55JTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQyVDMyVBMXAlMjBOZ3V5JUUxJUJCJTg1biUyME55JTIwTnklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjBUaCVFMSVCQiU4QiUyMFBoJUM2JUIwJUM2JUExbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm5odTIlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVFMSVCQSVBMW0lMjBMb25nJTIwR2lhJTIwTmglQzYlQjAlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnBoaSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUUxJUJBJUExbSUyME5nJUUxJUJCJThEYyUyMFBoaSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGFpJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUGglRTElQkElQTFtJTIwViVDNCU4M24lMjBUJUMzJUEwaSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGhhbyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUUxJUJBJUExbSUyMFRoJUUxJUJBJUEzbyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaGFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwSCVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmhhdSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkElQUR1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJxdWFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTWluaCUyMFF1JUMzJUEybiUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaG9hJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyVHIlRTElQkElQTduJTIwSG9hJTIyJTdEJTVE"; 
+        
+        let currentStudent = { id: "", name: "" };
+        let sectionStartTimes = {};
+
+        async function handleLogin() {
+            const id = document.getElementById('hs-id').value.trim();
+            const pass = document.getElementById('hs-pass').value.trim();
+            const msg = document.getElementById('login-msg');
+            
+            if(!id || !pass) return msg.innerText = "Nhập đủ ID và Mật khẩu!";
+            
+            try {
+                if(!ENCRYPTED_USERS) {
+                    msg.innerText = "Lỗi: Bài thi chưa được nhúng dữ liệu học sinh (Chưa tải từ Generator)!";
+                    return;
+                }
+                
+                // Giải mã danh sách học sinh
+                const users = JSON.parse(decodeURIComponent(atob(ENCRYPTED_USERS)));
+                
+                // Tìm kiếm thông tin học sinh ở môi trường cục bộ (so sánh id và pass)
+                const user = users.find(u => u.id == id && u.password == pass); // Đổi 'password' thành key phù hợp với Sheet của bạn
+                
+                if(user) {
+                    currentStudent.id = id; 
+                    currentStudent.name = user.name;
+                    document.getElementById('login-modal').style.display = 'none';
+                    
+                    // --- THÊM PHẦN HỎI VÀ HIỂN THỊ TÊN Ở ĐÂY ---
+                    // Hỏi xác nhận họ tên (Gợi ý sẵn tên lấy từ GG Sheet)
+                    const confirmedName = prompt("Vui lòng xác nhận Họ Tên của bạn để hiển thị trên bài làm:", currentStudent.name) || currentStudent.name;
+                    currentStudent.name = confirmedName; // Cập nhật lại nếu hs sửa
+                    
+                    // Hiển thị tên với viền RGB và Nút tải
+                    document.getElementById('student-name-display').innerHTML = "Học sinh: " + currentStudent.name + " - ID: " + currentStudent.id;
+                    document.getElementById('student-info-container').style.display = 'block';
+                    document.getElementById('btn-download-html').style.display = 'block';
+                    // -------------------------------------------
+
+                    quizData.forEach((sec, sIdx) => sectionStartTimes[sIdx] = Date.now());
+                    startHeartbeat(id);
+                } else { 
+                    msg.innerText = "Sai Mã học sinh hoặc Mật khẩu!"; 
+                }
+            } catch(e) { 
+                msg.innerText = "Lỗi hệ thống khi đăng nhập!"; 
+            }
+        }
+		
+		// ==========================================
+        // HỆ THỐNG TRACKING & CHỐNG GIAN LẬN
+        // ==========================================
+        function startHeartbeat(studentId) {
+            setInterval(function() {
+                const formData = new URLSearchParams();
+                formData.append('action', 'ping');
+                formData.append('id', studentId);
+                formData.append('status', getRealStatus()); 
+                fetch(GAS_URL, { method: "POST", body: formData })
+                .catch(err => console.log("Lỗi ping:", err));
+            }, 60000); 
+        }
+
+        window.addEventListener('beforeunload', function () {
+            if (typeof currentStudent !== 'undefined' && currentStudent.id) {
+                const formData = new FormData();
+                formData.append('action', 'ping');
+                formData.append('id', currentStudent.id);
+                formData.append('status', 'Mất kết nối (Thoát trang)');
+                navigator.sendBeacon(GAS_URL, formData);
+            }
+        });
+
+        function getRealStatus() {
+            // Tinh chỉnh riêng cho trang Toán 12: Kiểm tra trạng thái các nút nộp bài
+            const submitBtns = document.querySelectorAll('.btn-submit-section');
+            if (submitBtns.length === 0) return "Đang làm bài";
+            
+            let allSubmitted = true;
+            let submittedCount = 0;
+            
+            submitBtns.forEach(btn => {
+                if (btn.innerText !== "ĐÃ LƯU ĐIỂM") {
+                    allSubmitted = false;
+                } else {
+                    submittedCount++;
+                }
+            });
+
+            if (allSubmitted) return "Đã nộp xong tất cả (Đang xem giải thích)";
+            if (submittedCount > 0) return `Đã nộp ${submittedCount}/${submitBtns.length} chuyên đề`;
+            
+            return "Đang làm bài";
+        }
+
+        let tabSwitchTimeout;
+        let hasSentTabSwitchSignal = false; 
+
+        document.addEventListener("visibilitychange", function() {
+            if (typeof currentStudent !== 'undefined' && currentStudent.id) {
+                if (document.hidden) {
+                    tabSwitchTimeout = setTimeout(function() {
+                        hasSentTabSwitchSignal = true; 
+                        const formData = new FormData();
+                        formData.append('action', 'ping');
+                        formData.append('id', currentStudent.id);
+                        formData.append('status', '⚠️ ĐANG LƯỚT TAB KHÁC (Quá 1 phút)!');
+                        navigator.sendBeacon(GAS_URL, formData);
+                    }, 60000); 
+                } else {
+                    clearTimeout(tabSwitchTimeout);
+                    if (hasSentTabSwitchSignal) {
+                        let currentStatus = getRealStatus();
+                        const formData = new FormData();
+                        formData.append('action', 'ping');
+                        formData.append('id', currentStudent.id);
+                        formData.append('status', currentStatus);
+                        navigator.sendBeacon(GAS_URL, formData);
+                        hasSentTabSwitchSignal = false; 
+                    }
+                }
+            }
+        });
+
+        async function sendReportToSheet(score, total, timeSpent, testName, submitBtn) {
+            submitBtn.innerText = "ĐANG GỬI DỮ LIỆU..."; submitBtn.disabled = true;
+            const formData = new URLSearchParams();
+            formData.append('action', 'submitReport'); formData.append('id', currentStudent.id);
+            formData.append('name', currentStudent.name); formData.append('testName', testName);
+            formData.append('score', score + "/" + total); formData.append('time', timeSpent + " giây");
+            formData.append('details', "Đã nộp bài"); formData.append('note', 'Toán');
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: formData });
+                alert(`Lưu điểm phần "${testName}" thành công! (${score}/${total})`);
+                submitBtn.innerText = "ĐÃ LƯU ĐIỂM"; submitBtn.style.background = "#27ae60";
+            } catch(e) {
+                alert("Lỗi khi gửi kết quả! Hãy chụp màn hình lại.");
+                submitBtn.innerText = "LỖI - THỬ LẠI"; submitBtn.disabled = false;
+            }
+        }
+
+        window.submitSection = function(sIdx, btnId) {
+            const btn = document.getElementById(btnId);
+            const sec = quizData[sIdx];
+            let score = 0, totalItems = 0;
+            
+            sec.questions.forEach((q, qIdx) => {
+                const id = sIdx + '_' + qIdx;
+                if (q.qType === "1") {
+                    totalItems++;
+                    const selected = document.querySelector(`input[name="q${id}"]:checked`);
+                    if(selected && selected.value === q.correct) score++;
+                } else if (q.qType === "2") {
+                    totalItems += 4;
+                    ['A','B','C','D'].forEach(opt => {
+                        const selected = document.querySelector(`input[name="q${id}_${opt}"]:checked`);
+                        if(selected && selected.value === q.correct[opt]) score++;
+                    });
+                } else if (q.qType === "3") {
+                    totalItems++;
+                    const input = document.getElementById(`q${id}_sa`);
+                    if(input) {
+                        const userAns = input.value.trim().toLowerCase();
+                        const correctVals = q.correct.split(';').map(v => v.trim().toLowerCase());
+                        if (correctVals.includes(userAns)) score++;
+                    }
+                }
+            });
+            
+            let timeSpent = sectionStartTimes[sIdx] ? Math.floor((Date.now() - sectionStartTimes[sIdx]) / 1000) : 0;
+            sendReportToSheet(score, totalItems, timeSpent, sec.title, btn);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            let html = "";
+
+            quizData.forEach((sec, sIdx) => {
+                html += `<h2 class="section-header">${sec.title}</h2>`;
+                sec.questions.forEach((q, qIdx) => {
+                    const id = sIdx + '_' + qIdx;
+                    
+                    // Chỉ giữ lại icon bóng đèn, đổi hàm onclick thành showHintModal và truyền sIdx, qIdx
+                    let hintIcon = q.hint ? `<span class="hint-icon" onclick="showHintModal(${sIdx}, ${qIdx})" title="Click để xem gợi ý">💡</span>` : '';
+
+                    // Khung hiển thị Đoạn trích / Ngữ liệu cho Học sinh
+                    if (q.context) {
+                        html += `<div class="passage-box" style="background:#e8f4f8; padding:20px; border-left:5px solid #2980b9; margin-bottom:20px; border-radius:6px; font-size:16.5px; line-height:1.8; box-shadow:0 2px 4px rgba(0,0,0,0.05); font-family:serif;">
+                            ${q.context}
+                        </div>`;
+                    }
+					
+					html += `<div class="question-box" id="qBox_${id}">
+                                <div class="q-text">
+                                    ${q.qText}
+                                    ${hintIcon}
+                                </div>`;
+                                
+                    if (q.image) html += `<img src="${q.image}" style="max-width:100%; border-radius:4px; margin-bottom:15px;">`;
+                    
+                    // Nâng cấp HTML Type 1 & 2 với class mới
+                    if (q.qType === "1") {
+                        html += `<div class="options-grid">
+                            <label class="option-label" id="lbl_${id}_A"><input type="radio" name="q${id}" value="A"><span class="opt-letter">A</span> ${q.options.A}</label>
+                            <label class="option-label" id="lbl_${id}_B"><input type="radio" name="q${id}" value="B"><span class="opt-letter">B</span> ${q.options.B}</label>
+                            <label class="option-label" id="lbl_${id}_C"><input type="radio" name="q${id}" value="C"><span class="opt-letter">C</span> ${q.options.C}</label>
+                            <label class="option-label" id="lbl_${id}_D"><input type="radio" name="q${id}" value="D"><span class="opt-letter">D</span> ${q.options.D}</label>
+                        </div>`;
+                    } else if (q.qType === "2") {
+                        html += `<table class="tf-table">
+                            <tr><th>Mệnh đề</th><th width="80px">Đúng</th><th width="80px">Sai</th></tr>
+                            ${['A','B','C','D'].map(opt => `
+                            <tr>
+                                <td><span class="opt-letter-tf">${opt}</span> ${q.options[opt]}</td>
+                                <td class="tf-cell-center" id="td_${id}_${opt}_D">
+                                    <label class="tf-radio-label"><input type="radio" name="q${id}_${opt}" value="Đ"><span class="tf-btn">Đ</span></label>
+                                </td>
+                                <td class="tf-cell-center" id="td_${id}_${opt}_S">
+                                    <label class="tf-radio-label"><input type="radio" name="q${id}_${opt}" value="S"><span class="tf-btn">S</span></label>
+                                </td>
+                            </tr>`).join('')}
+                        </table>`;
+                    } else if (q.qType === "3") {
+						html += `<div>
+							<input type="text" id="q${id}_sa" class="sa-input" placeholder="Nhập hoặc tick chọn đáp án..." style="font-size:20px; font-weight:bold; margin-bottom:15px; text-align:center;">
+							<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width: 400px; margin: 0 auto;">
+								${['1','2','3','4','5','6','7','8','9','0','-',',','.'].map(char => 
+									`<button type="button" style="width:45px; height:45px; border-radius:50%; background:#fff; border:2px solid #bdc3c7; font-size:18px; font-weight:bold; color:#2c3e50; cursor:pointer;" onmouseover="this.style.background='#ecf0f1'" onmouseout="this.style.background='#fff'" onclick="document.getElementById('q${id}_sa').value += '${char}'">${char}</button>`
+								).join('')}
+								<button type="button" style="height:45px; padding:0 20px; border-radius:25px; background:#e74c3c; border:none; font-size:16px; font-weight:bold; color:white; cursor:pointer;" onclick="let input = document.getElementById('q${id}_sa'); input.value = input.value.slice(0, -1);">Xóa</button>
+							</div>
+						</div>`;
+					}
+
+                    html += `<div class="actions">
+                                <button class="btn-check" onclick="checkAnswer(${sIdx}, ${qIdx})">Kiểm tra ngay</button>
+                                <button class="btn-key" id="btnKey_${id}" onclick="showKey(${sIdx}, ${qIdx})">Xem Lời Giải</button>
+                            </div>
+                            <div class="feedback" id="feedback_${id}"></div>
+                            <div class="explanation-box" id="exp_${id}">${q.explanation}</div>
+                        </div>`;
+                });
+                const btnId = 'submitBtn_' + sIdx;
+                html += `<button id="${btnId}" class="btn-submit-section" onclick="submitSection(${sIdx}, '${btnId}')">NỘP BÀI & LƯU ĐIỂM CHUYÊN ĐỀ NÀY</button><hr style="margin-top:40px;">`;
+            });
+            container.innerHTML = html;
+        }
+		
+		window.showHintModal = function(sIdx, qIdx) {
+            const q = quizData[sIdx].questions[qIdx];
+            if (!q || !q.hint) return;
+            
+            const modalBody = document.getElementById('hint-modal-body');
+            // Chuyển đổi dấu xuống dòng
+            modalBody.innerHTML = q.hint.replace(/\n/g, '<br>');
+            
+            // Hiển thị pop-up
+            document.getElementById('hint-modal-overlay').style.display = 'flex';
+            
+            // Yêu cầu MathJax render lại công thức Toán trong pop-up
+            if (window.MathJax) {
+                MathJax.typesetPromise([modalBody]);
+            }
+        };
+
+        window.closeHintModal = function() {
+            document.getElementById('hint-modal-overlay').style.display = 'none';
+        };
+
+        window.checkAnswer = function(sIdx, qIdx) {
+            const id = sIdx + '_' + qIdx;
+            const q = quizData[sIdx].questions[qIdx];
+            const feedback = document.getElementById(`feedback_${id}`);
+            document.getElementById(`btnKey_${id}`).style.display = 'inline-block';
+            let isAllCorrect = true;
+
+            if (q.qType === "1") {
+                const selected = document.querySelector(`input[name="q${id}"]:checked`);
+                ['A', 'B', 'C', 'D'].forEach(opt => document.getElementById(`lbl_${id}_${opt}`).className = 'option-label');
+                if (!selected) { isAllCorrect = false; } 
+                else if (selected.value === q.correct) { document.getElementById(`lbl_${id}_${selected.value}`).classList.add('correct'); } 
+                else { document.getElementById(`lbl_${id}_${selected.value}`).classList.add('wrong'); isAllCorrect = false; }
+            } 
+            else if (q.qType === "2") {
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    const selected = document.querySelector(`input[name="q${id}_${opt}"]:checked`);
+                    const tdD = document.getElementById(`td_${id}_${opt}_D`);
+                    const tdS = document.getElementById(`td_${id}_${opt}_S`);
+                    tdD.className = 'tf-cell-center'; tdS.className = 'tf-cell-center';
+                    
+                    if (!selected) { isAllCorrect = false; }
+                    else if (selected.value === q.correct[opt]) {
+                        if(selected.value === 'Đ') tdD.classList.add('tf-correct'); else tdS.classList.add('tf-correct');
+                    } else {
+                        if(selected.value === 'Đ') tdD.classList.add('tf-wrong'); else tdS.classList.add('tf-wrong');
+                        isAllCorrect = false;
+                    }
+                });
+            }
+            else if (q.qType === "3") {
+                const input = document.getElementById(`q${id}_sa`);
+                const userAns = input.value.trim().toLowerCase();
+                const correctVals = q.correct.split(';').map(v => v.trim().toLowerCase());
+                if (!userAns) isAllCorrect = false;
+                else if (correctVals.includes(userAns)) { input.style.borderColor = '#2ecc71'; input.style.backgroundColor = '#d5f5e3'; }
+                else { input.style.borderColor = '#e74c3c'; input.style.backgroundColor = '#fadbd8'; isAllCorrect = false; }
+            }
+
+            feedback.innerHTML = isAllCorrect ? '<span style="color:#2ecc71">Xuất sắc! Bạn chọn đúng hết! 🎉</span>' : '<span style="color:#e74c3c">Có chỗ sai sót, hãy kiểm tra lại.</span>';
+        };
+
+        window.showKey = function(sIdx, qIdx) {
+            const id = sIdx + '_' + qIdx;
+            const q = quizData[sIdx].questions[qIdx];
+            const exp = document.getElementById(`exp_${id}`);
+            
+            let correctText = "";
+            if(q.qType === "1") correctText = `<strong>Đáp án đúng: ${q.correct}</strong><br><br>`;
+            else if(q.qType === "2") correctText = `<strong>Key: A-${q.correct.A} | B-${q.correct.B} | C-${q.correct.C} | D-${q.correct.D}</strong><br><br>`;
+            else if(q.qType === "3") correctText = `<strong>Đáp án được chấp nhận: ${q.correct}</strong><br><br>`;
+
+            exp.innerHTML = correctText + q.explanation;
+            exp.style.display = 'block';
+            if (window.MathJax) MathJax.typesetPromise([exp]);
+        };
+		
+		// ==========================================
+        // HÀM LƯU BÀI LÀM ĐÃ CHẤM THÀNH FILE HTML
+        // ==========================================
+        window.downloadGradedHTML = function() {
+            const btnDownload = document.getElementById('btn-download-html');
+            btnDownload.innerText = "ĐANG TẠO FILE...";
+            
+            // 1. Đồng bộ trạng thái giao diện vào HTML Attributes để giữ nguyên thao tác
+            document.querySelectorAll('input[type="radio"]').forEach(el => {
+                if (el.checked) el.setAttribute('checked', 'checked');
+                else el.removeAttribute('checked');
+            });
+            document.querySelectorAll('input[type="text"]').forEach(el => {
+                el.setAttribute('value', el.value);
+            });
+
+            // 2. Clone toàn bộ mã nguồn hiện tại của trang
+            const clone = document.documentElement.cloneNode(true);
+
+            // 3. Xóa các thành phần không cần thiết ở bản offline
+            const elementsToRemove = ['#login-modal', '#btn-download-html', '.btn-submit-section', '.btn-check'];
+            elementsToRemove.forEach(selector => {
+                clone.querySelectorAll(selector).forEach(el => el.remove());
+            });
+
+            // 4. Khóa toàn bộ input và button (NHƯNG giữ lại nút Xem Lời Giải)
+            clone.querySelectorAll('input, button:not(.btn-key)').forEach(el => el.setAttribute('disabled', 'true'));
+
+            // 5. XỬ LÝ LỖI "RENDER LẠI TỪ ĐẦU" (Dùng replace chuỗi để an toàn tuyệt đối, tránh lỗi regex)
+            clone.querySelectorAll('script').forEach(script => {
+                let code = script.innerHTML;
+                code = code.replace('function renderQuiz() {', 'function renderQuiz() { return; /* Đã chặn render offline */ ');
+                code = code.replace('startHeartbeat(id);', '/* Bản offline: Đã chặn heartbeat */');
+                script.innerHTML = code;
+            });
+
+            // 6. Tạo file và ép trình duyệt tải xuống (Đã xóa ký tự xuống dòng)
+            const htmlContent = "<!DOCTYPE html>" + clone.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Tên file xuất ra chứa toàn bộ bài làm
+            const safeName = currentStudent.name ? currentStudent.name.replace(/\s+/g, '_') : 'Khach';
+            const safeId = currentStudent.id ? currentStudent.id : 'Unknown';
+            a.download = `BaiLam_${safeName}_${safeId}.html`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            btnDownload.innerText = "📥 TẢI BÀI ĐÃ CHẤM";
+        };
+
+        renderQuiz();
+    </script>
+</body>
+</html>

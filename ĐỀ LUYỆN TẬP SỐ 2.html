@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn thi Đánh giá năng lực ĐHQG TP HCM </title>
+    <script>
+        window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f0f2f5; line-height: 1.6; }
+        h1 { text-align: center; color: #1a237e; }
+        .section-header { color: #e67e22; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 40px; margin-bottom: 20px; }
+        .question-box { background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; }
+        
+        /* Ẩn input radio mặc định */
+        input[type="radio"] { display: none; }
+        
+        /* Trắc nghiệm Format Mới */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .option-label { display: flex; align-items: center; padding: 10px; border: 1px solid #dcdde1; border-radius: 8px; cursor: pointer; transition: 0.2s; background: #fafafa; }
+        .option-label:hover { background: #f1f2f6; }
+        
+        .opt-letter { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 50%; background-color: white; color: #3498db; border: 2px solid #3498db; box-sizing: border-box; font-weight: bold; margin-right: 12px; font-size: 15px; transition: 0.2s; }
+		input[type="radio"]:checked + .opt-letter { background-color: #3498db; color: white; box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2); }
+        .option-label.correct { border-color: #2ecc71; background: #d5f5e3; }
+        .option-label.correct .opt-letter { background-color: #27ae60; }
+        .option-label.wrong { border-color: #e74c3c; background: #fadbd8; }
+        .option-label.wrong .opt-letter { background-color: #e74c3c; }
+        
+        /* Đúng Sai Format Mới */
+        .tf-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .tf-table th, .tf-table td { border: 1px solid #dcdde1; padding: 12px; }
+        .tf-table th { background: #f8f9f9; text-align: center; }
+        .tf-cell-center { text-align: center; }
+        
+        .opt-letter-tf { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; border-radius: 4px; background-color: #34495e; color: white; font-weight: bold; margin-right: 10px; font-size: 14px; }
+        .tf-radio-label { display: block; cursor: pointer; }
+        .tf-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background-color: #ecf0f1; font-weight: bold; color: #7f8c8d; transition: 0.2s; }
+        
+        input[type="radio"][value="Đ"]:checked + .tf-btn { background-color: #2ecc71; color: white; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.3); }
+        input[type="radio"][value="S"]:checked + .tf-btn { background-color: #e74c3c; color: white; box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3); }
+        .tf-correct .tf-btn { background-color: #27ae60 !important; color: white !important; }
+        .tf-wrong .tf-btn { background-color: #c0392b !important; color: white !important; }
+
+        /* Trả lời ngắn */
+        .sa-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
+        .sa-input:focus { border-color: #3498db; outline: none; }
+        
+        .actions { margin-top: 15px; display: flex; gap: 10px; }
+        button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-check { background: #3498db; }
+        .btn-key { background: #9b59b6; display: none; }
+        .btn-submit-section { background: #e74c3c; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; border-radius: 8px; }
+        .feedback { margin-top: 10px; font-weight: bold; }
+        .explanation-box { display: none; margin-top: 15px; padding: 15px; background: #f8f9f9; border-left: 4px solid #f1c40f; border-radius: 4px; }
+        
+        #login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; width: 320px; text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px;}
+        .login-box button { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 5px; font-size: 16px;}
+    
+		/* Hiệu ứng RGB cho tên Học sinh */
+        .rgb-wrapper { text-align: center; display: none; margin-bottom: 20px; }
+        .rgb-box {
+            position: relative; padding: 12px 30px; background: #fff;
+            border-radius: 8px; display: inline-block; font-size: 18px;
+            font-weight: bold; color: #1a237e; text-transform: uppercase;
+        }
+        .rgb-box::before {
+            content: ""; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%; border-radius: 12px; z-index: -1;
+            animation: rgb-border 10s linear infinite;
+        }
+        @keyframes rgb-border {
+            0% { background-position: 0 0; } 50% { background-position: 400% 0; } 100% { background-position: 0 0; }
+        }
+
+        /* Nút Tải bài đã chấm */
+        #btn-download-html {
+            position: fixed; bottom: 20px; right: 20px; background: #34495e; color: white;
+            padding: 15px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none; z-index: 999; font-size: 16px; border: 2px solid #ecf0f1; transition: 0.3s;
+        }
+        #btn-download-html:hover { background: #2c3e50; transform: scale(1.05); }
+		
+		.hint-icon { cursor: pointer; font-size: 20px; margin-left: 10px; display: inline-block; transition: transform 0.2s; user-select: none; }
+        .hint-icon:hover { transform: scale(1.2); }
+        .hint-box { display: none; background: #fffdf7; border-left: 4px solid #f1c40f; padding: 15px; margin-top: 15px; border-radius: 4px; font-size: 15px; color: #555; }
+		
+		/* CSS cho Pop-up Gợi ý */
+        #hint-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .hint-modal-content { background: white; padding: 25px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; font-size: 16px; line-height: 1.6; border-top: 5px solid #f1c40f; }
+        .close-hint-btn { position: absolute; top: 15px; right: 15px; background: #e74c3c; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; justify-content: center; align-items: center; }
+		
+		
+	</style>
+</head>
+<body>
+    <div id="login-modal">
+        <div class="login-box">
+            <h2>Đăng Nhập Làm Bài</h2>
+            <input type="text" id="hs-id" placeholder="Mã học sinh (ID)">
+            <input type="password" id="hs-pass" placeholder="Mật khẩu">
+            <button id="btnLogin" onclick="handleLogin()">ĐĂNG NHẬP</button>
+            <div id="login-msg" style="color: #e74c3c; margin-top: 10px;"></div>
+        </div>
+    </div>
+	
+	<div id="hint-modal-overlay" onclick="if(event.target === this) closeHintModal()">
+        <div class="hint-modal-content">
+            <button class="close-hint-btn" onclick="closeHintModal()">×</button>
+            <h3 style="margin-top:0; color:#d35400;">💡 Gợi ý</h3>
+            <div id="hint-modal-body"></div>
+        </div>
+    </div>
+
+    <h1>Ôn thi Đánh giá năng lực ĐHQG TP HCM </h1>
+	<!-- KHUNG HIỂN THỊ TÊN HỌC SINH -->
+    <div class="rgb-wrapper" id="student-info-container">
+        <div class="rgb-box" id="student-name-display"></div>
+    </div>
+    <div id="quizContainer"></div>
+	<!-- NÚT TẢI BÀI -->
+    <button id="btn-download-html" onclick="downloadGradedHTML()">📥 TẢI BÀI ĐÃ CHẤM</button>
+
+    <script>
+        
+        const quizData = [{"title":"PHẦN 2","questions":[{"originalNum":1,"qType":"1","qText":"Câu 1 (NB): Trong các dòng sau, dòng nào chỉ bao gồm các câu thành ngữ?","context":"","image":null,"options":{"A":"Lên thác xuống ghềnh; Tấc đất tấc vàng; Tứ cố vô thân","B":"Một nắng hai sương; No cơm ấm cật; Sinh cơ lập nghiệp","C":"Ngày lành tháng tốt; Nhất thì nhì thục; Tháng bảy kiến bò, chỉ lo lại lụt","D":"Bách chiến bách thắng; Tứ cố vô thân; Trăng quầng thì hạn, trăng tán thì mưa"},"correct":"B","explanation":"(NB): Trong các dòng sau, dòng nào chỉ bao gồm các câu thành ngữ?<br>\tA. Lên thác xuống ghềnh; Tấc đất tấc vàng; Tứ cố vô thân <br> \tB. Một nắng hai sương; No cơm ấm cật; Sinh cơ lập nghiệp<br>\tC. Ngày lành tháng tốt; Nhất thì nhì thục; Tháng bảy kiến bò, chỉ lo lại lụt<br>\tD. Bách chiến bách thắng; Tứ cố vô thân; Trăng quầng thì hạn, trăng tán thì mưa<br>Phương pháp giải: Căn cứ bài Thành ngữ<br>Giải chi tiết: Thành ngữ<br>Phương án A: Tấc đất tấc vàng là tục ngữ<br>Phương án C: Nhất thì nhì thục; Tháng bảy kiến bò, chỉ lo lạt lụt là tục ngữ<br>Phương án D: Trăng quầng thì hạn, trăng tán thì mưa là tục ngữ","hint":""},{"originalNum":2,"qType":"1","qText":"Câu 2 (NB): Dạ đài (Trong câu Dạ đài cách mặt khuất lời – Truyện Kiều – Nguyễn Du) là từ chỉ:","context":"","image":null,"options":{"A":"nơi mà Kiều sẽ đến chung sống với Mã Giám Sinh.","B":"một địa danh mang tính ước lệ.","C":"cõi chết (hay cõi âm) lạnh lẽo, tăm tối.","D":"nơi thờ phụng của một dòng tộc."},"correct":"C","explanation":"(NB): Dạ đài (Trong câu Dạ đài cách mặt khuất lời – Truyện Kiều – Nguyễn Du) là từ chỉ:<br>\tA. nơi mà Kiều sẽ đến chung sống với Mã Giám Sinh.  <br>\tB. một địa danh mang tính ước lệ.  <br>\tC. cõi chết (hay cõi âm) lạnh lẽo, tăm tối.  <br>\tD. nơi thờ phụng của một dòng tộc.<br>Phương pháp giải: Căn cứ bài Trao duyên – Trích Truyện Kiều – Nguyễn Du<br>Giải chi tiết: Dạ đài cách mặt khuất lời => “dạ đài” ở đây là nơi âm phủ tăm tối, lạnh lẽo, nơi cách biệt âm – dương.<br>Thuý Kiều nói vậy để ẩn dụ cho tương lai tăm tối, mờ mịt của mình.","hint":""},{"originalNum":3,"qType":"1","qText":"Câu 3 (NB): Từ chăng trong câu thơ của Nguyễn Trãi: Bui một tấc lòng trung liễn hiếu/ Mài chăng khuyết,<br>nhuộm chăng đen có nghĩa là gì?","context":"","image":null,"options":{"A":"khó","B":"chẳng","C":"không","D":"cả B và C"},"correct":"D","explanation":"(NB): Từ chăng trong câu thơ của Nguyễn Trãi: Bui một tấc lòng trung liễn hiếu/ Mài chăng khuyết,<br>nhuộm chăng đen có nghĩa là gì?  <br>\tA. khó \tB. chẳng \tC. không \tD. cả B và C<br>Phương pháp giải: Căn cứ bài Thuật hứng – Nguyễn Trãi<br>Giải chi tiết: “chăng” ở đây là chẳng, không","hint":""},{"originalNum":4,"qType":"1","qText":"Câu 4 (NB): Nhóm từ nào dưới đây khác với các nhóm từ còn lại?","context":"","image":null,"options":{"A":"cầm, nắm, viết, ôm, ném, đấm","B":"nhà, đường, cây, hoa","C":"trầm ngâm, náo nức, im lặng","D":"đi, chạy, nhảy, đá, tát, đạp"},"correct":"D","explanation":"(NB): Nhóm từ nào dưới đây khác với các nhóm từ còn lại?<br>\tA. cầm, nắm, viết, ôm, ném, đấm\tB. nhà, đường, cây, hoa<br>\tC. trầm ngâm, náo nức, im lặng\tD. đi, chạy, nhảy, đá, tát, đạp<br>Phương pháp giải: Căn cứ bài về từ loại tiếng Việt<br>Giải chi tiết: Phương án A: cầm, nắm, viết, ôm, ném, đấm => các từ này là động từ chỉ hành động của tay.       <br>Phương án B: nhà, đường, cây, hoa => các từ là danh từ chỉ sự vật.<br>Phương án C: trầm ngâm, náo nức, im lặng => Các từ là động từ chỉ trạng thái.               <br>Phương án D: đi, chạy, nhảy, đá, tát, đạp => các từ là động từ chỉ hành động, tuy nhiên từ “tát” lại là động từ chỉ hành động của tay, trong khi các từ còn lại chỉ hành động của chân.","hint":""},{"originalNum":5,"qType":"1","qText":"Câu 5 (NB): Thể hát nói phù hợp với việc diễn tả tâm trạng của kiểu nghệ sĩ nào?","context":"","image":null,"options":{"A":"tài tử","B":"khuôn mẫu","C":"kín đáo","D":"bồng bột"},"correct":"A","explanation":"(NB): Thể hát nói phù hợp với việc diễn tả tâm trạng của kiểu nghệ sĩ nào?<br>\tA. tài tử\tB. khuôn mẫu \tC. kín đáo \tD. bồng bột <br>Phương pháp giải: Căn cứ kiến thức về thể hát nói<br>Giải chi tiết: Đối với thể hát nói, hình mẫu của người tài tử có tài kinh luân, kinh bang tế thế không phải là mẫu hiền nhân quân tử, mẫu nhân giả hay trí giả như tiêu chí làm người lý tưởng của Nho giáo, mà là mẫu người có loại hoài bão, dục vọng mang những giá trị thực của cuộc sống. Đó là văn nhân và tráng sĩ, tay bút nghiên, tay cung kiếm.","hint":""},{"originalNum":6,"qType":"1","qText":"Câu 6 (TH): Hai câu: “Phía bắc núi Bắc núi muôn trùng/ Phía nam núi Nam sóng muôn đợt” sử dụng biện<br>pháp nghệ thuật gì?","context":"","image":null,"options":{"A":"nói quá","B":"ẩn dụ","C":"dùng điển tích","D":"liệt kê"},"correct":"B","explanation":"(TH): Hai câu: “Phía bắc núi Bắc núi muôn trùng/ Phía nam núi Nam sóng muôn đợt” sử dụng biện<br>pháp nghệ thuật gì?<br>\tA. nói quá\tB. ẩn dụ \tC. dùng điển tích \tD. liệt kê <br>Phương pháp giải: Căn cứ bài Bài ca ngắn đi trên bãi cát – Cao Bá Quát<br>Giải chi tiết: - “Phía bắc núi Bắc núi muôn trùng/ Phí nam núi Nam sóng muôn đợt” => Tả thực: khung cảnh gợi cảm giác ngột ngạt, bó buộc.<br>⇒ Thiên nhiên phía Bắc, phía Nam đều đẹp hùng vĩ nhưng cũng đầy khó khăn hiểm trở, đi mà chỉ thấy phía trước là núi là biển mênh mông mịt mờ.<br>+ Biểu tượng cho ý niệm: cuộc đời bế tắc, ngột ngạt.<br>⇒ Nghĩa ẩn dụ, tượng trưng: con đường đời đầy chông gai mà kẻ sĩ như Cao Bá Quát phải dấn thân để mưu cầu công danh.","hint":""},{"originalNum":7,"qType":"1","qText":"Câu 7 (NB): Câu lục bát nào sau đây không phải là thơ?","context":"","image":null,"options":{"A":"Hỡi cô tát nước bên đàng/ Sao cô múc ánh trăng vàng đổ đi?","B":"Chiều chiều ra đứng ngõ sau/ Trông về quê mẹ ruột đau chín chiều.","C":"Giống ruồi là giống hiểm nguy/ Bởi vì cánh nó mang vi trùng nhiều.","D":"Đường vô xứ Nghệ quanh quanh/ Non xanh nước biếc như tranh hoạ đồ."},"correct":"C","explanation":"(NB): Câu lục bát nào sau đây không phải là thơ?<br>\tA. Hỡi cô tát nước bên đàng/ Sao cô múc ánh trăng vàng đổ đi?  <br>\tB. Chiều chiều ra đứng ngõ sau/ Trông về quê mẹ ruột đau chín chiều.  <br>\tC. Giống ruồi là giống hiểm nguy/ Bởi vì cánh nó mang vi trùng nhiều.<br>\tD. Đường vô xứ Nghệ quanh quanh/ Non xanh nước biếc như tranh hoạ đồ.<br>Phương pháp giải: Căn cứ kiến thức về thể thơ lục bát<br>Giải chi tiết: - Thơ có chức năng truyền tải một tư tưởng, tình cảm, cảm xúc nào đó.<br>- Phương thức biểu đạt của thơ là biểu cảm.<br>- Thơ lục bát bắt nguồn từ dân gian tồn tại dưới nhiều hình thức nhưng tựu chung lại đều thấm đượm tình cảm và nồng nàn hồn quê con người.<br>- Câu: Giống ruồi là giống hiểm nguy/ Bởi vì cánh nó mang vi trùng nhiều. không phải là thơ lục bát, cũng không phải là thơ vì nó không truyền tải được bất cứ tình cảm cảm xúc nào của con người.","hint":""},{"originalNum":8,"qType":"1","qText":"Câu 8 (NB): Chọn từ viết đúng chính tả trong các từ sau:","context":"","image":null,"options":{"A":"dữ dằn","B":"hung giữ","C":"rữ rìn","D":"dữ của"},"correct":"A","explanation":"(NB): Chọn từ viết đúng chính tả trong các từ sau:<br>\tA. dữ dằn \tB. hung giữ \tC. rữ rìn \tD. dữ của <br>Phương pháp giải: Căn cứ các bài chính tả về d/r/gi<br>Giải chi tiết: Các phương án B, C, D viết sai chính tả:<br>Sửa lại:<br>hung giữ => hung dữ<br>rữ rìn => giữ gìn<br>dữ của => giữ của","hint":""},{"originalNum":9,"qType":"1","qText":"Câu 9 (NB): Xác định từ viết sai chính tả trong câu văn sau: “Ở dưới gần cụm lá sả, hai ba chú mái tơ thi<br>nhau dụi đất, thỉnh thoảng lại rũ cánh phành phạch”. (Theo Tô Hoài)","context":"","image":null,"options":{"A":"lá sả","B":"dụi đất","C":"rũ cánh","D":"không có từ sai"},"correct":"B","explanation":"(NB): Xác định từ viết sai chính tả trong câu văn sau: “Ở dưới gần cụm lá sả, hai ba chú mái tơ thi<br>nhau dụi đất, thỉnh thoảng lại rũ cánh phành phạch”. (Theo Tô Hoài)<br>\tA. lá sả \tB. dụi đất \tC. rũ cánh \tD. không có từ sai<br>Phương pháp giải: Căn cứ các bài chính tả về d/r/gi<br>Giải chi tiết: Từ viết sai “dụi đất”.<br>Sửa lại “rụi đất”.","hint":""},{"originalNum":10,"qType":"1","qText":"Câu 10 (NB): “Với lòng mong nhớ của anh, chắc anh nghĩ rằng, con anh sẽ chạy xô vào lòng anh, sẽ ôm chặt<br>lấy cổ anh” (Theo Nguyễn Quang Sáng), “Chắc” là thành phần biệt lập nào của câu?","context":"","image":null,"options":{"A":"Thành phần tình thái","B":"Thành phần tình thái","C":"Thành phần gọi đáp","D":"Thành phần phụ chú"},"correct":"A","explanation":"(NB): “Với lòng mong nhớ của anh, chắc anh nghĩ rằng, con anh sẽ chạy xô vào lòng anh, sẽ ôm chặt<br>lấy cổ anh” (Theo Nguyễn Quang Sáng), “Chắc” là thành phần biệt lập nào của câu?<br>\tA. Thành phần tình thái\tB. Thành phần tình thái<br>\tC. Thành phần gọi đáp\t\tD. Thành phần phụ chú<br>Phương pháp giải: Căn cứ bài Các thành phần biệt lập<br>Giải chi tiết: - Thành phần biệt lập là những bộ phận không tham gia vào việc diễn đạt nghĩa sự việc của câu. Có 4 kiểu thành phần biệt lập:<br>+ Thành phần tình thái.<br>+ Thành phần cảm thán.<br>+ Thành phần gọi đáp.<br>+ Thành phần phụ chú.<br>- “Chắc” trong câu văn nêu trên là thành phần tình thái, vì nó thể hiện cách nhìn của người nói đối với sự việc được nói đến trong câu.","hint":""},{"originalNum":11,"qType":"1","qText":"Câu 11 (NB): “Anh đội viên nhìn Bác/ Càng nhìn lại càng thương/ Người Cha mái tóc bạc/ Đốt lửa cho anh<br>nằm”, xác định kiểu ẩn dụ trong khổ thơ trên:","context":"","image":null,"options":{"A":"Ẩn dụ hình thức","B":"Ẩn dụ hình thức","C":"Ẩn dụ phẩm chất","D":"Ẩn dụ chuyển đổi cảm giác"},"correct":"C","explanation":"(NB): “Anh đội viên nhìn Bác/ Càng nhìn lại càng thương/ Người Cha mái tóc bạc/ Đốt lửa cho anh<br>nằm”, xác định kiểu ẩn dụ trong khổ thơ trên:<br>\tA. Ẩn dụ hình thức\t\tB. Ẩn dụ hình thức<br>\tC. Ẩn dụ phẩm chất\t\tD. Ẩn dụ chuyển đổi cảm giác<br>Phương pháp giải: Căn cứ bài Ẩn dụ<br>Giải chi tiết: - Ẩn dụ là gọi tên sự vật, hiện tượng này bằng tên sự vật, hiện tượng  khác có nét tương đồng nhằm tăng sức biểu cảm cho sự diễn đạt. Các kiểu ẩn dụ bao gồm: ẩn dụ hình thức, ẩn dụ cách thức, ẩn dụ phẩm chất và ẩn dụ chuyển đổi cảm giác.<br>- Người cha và Bác có những điểm tương đồng với nhau về phẩm chất như: yêu thương, quan tâm, chăm sóc những đứa con của mình (các anh đội viên).<br>Bởi vậy hình thức ẩn dụ trong câu thơ là ẩn dụ phẩm chất.","hint":""},{"originalNum":12,"qType":"1","qText":"Câu 12 (NB): “Hút thuốc lá vừa có hại cho sức khỏe, vừa làm giảm tuổi thọ của con người”. Đây là câu:","context":"","image":null,"options":{"A":"thiếu chủ ngữ","B":"thiếu vị ngữ","C":"thiếu quan hệ từ","D":"sai logic"},"correct":"D","explanation":"(NB): “Hút thuốc lá vừa có hại cho sức khỏe, vừa làm giảm tuổi thọ của con người”. Đây là câu:<br>\tA. thiếu chủ ngữ \tB. thiếu vị ngữ \tC. thiếu quan hệ từ \tD. sai logic <br>Phương pháp giải: Căn cứ bài Chữa lỗi diễn đạt (lỗi logic)<br>Giải chi tiết: - Câu này sai phạm về suy luận, cụ thể là không phân biệt thứ bậc của các quan hệ.<br>- Cách suy luận đúng là: Hút thuốc lá là một trong những nguyên nhân gây hại cho sức khỏe, sức khỏe bị hại là một trong những nguyên nhân làm giảm tuổi thọ của con người. Suy luận này gồm có hai bậc, có thể hình dung như sau:<br>+ Hút thuốc lá gây hại cho sức khỏe.<br>+ Sức khỏe bị hại làm giảm tuổi thọ của con người.<br>- Để sửa lỗi sai chúng ta cần thay đổi cách dùng quan hệ từ “vừa”. Dùng hai từ “vừa” như trên tạo ra quan hệ đồng thời, không phải quan hệ thứ bậc.<br>- Sửa lại: Hút thuốc lá có hại cho sức khỏe, khiến giảm tuổi thọ của con người.","hint":""},{"originalNum":13,"qType":"1","qText":"Câu 13 (NB): Xác định câu văn luận điểm trong đoạn văn sau: “Tiếng Việt có những đặc sắc của một thứ<br>tiếng đẹp, một thứ tiếng hay. Nói thế có nghĩa là nói rằng: tiếng Việt là một thứ tiếng hài hòa về mặt âm hưởng,<br>thanh điệu mà cũng rất tế nhị, uyển chuyển trong cách đặt câu. Nói thế cũng có nghĩa là nói rằng: tiếng Việt có<br>đầy đủ khả năng để diễn đạt tình cảm, tư tưởng của người Việt Nam và thỏa mãn cho yêu cầu của đời sống văn<br>hóa nước nhà qua các thời kì lịch sử”. (Theo Đặng Thai Mai)","context":"","image":null,"options":{"A":"Tiếng Việt có những đặc sắc của một thứ tiếng đẹp, một thứ tiếng hay","B":"Nói thế có nghĩa là nói rằng: tiếng Việt là một thứ tiếng hài hòa về mặt âm hưởng, thanh điệu mà cũng rất<br>tế nhị, uyển chuyển trong cách đặt câu","C":"Nói thế cũng có nghĩa là nói rằng: tiếng Việt có đầy đủ khả năng để diễn đạt tình cảm, tư tưởng của người<br>Việt Nam và thỏa mãn cho yêu cầu của đời sống văn hóa nước nhà qua các thời kì lịch sử","D":"Không có câu văn mang luận điểm."},"correct":"A","explanation":"(NB): Xác định câu văn luận điểm trong đoạn văn sau: “Tiếng Việt có những đặc sắc của một thứ<br>tiếng đẹp, một thứ tiếng hay. Nói thế có nghĩa là nói rằng: tiếng Việt là một thứ tiếng hài hòa về mặt âm hưởng,<br>thanh điệu mà cũng rất tế nhị, uyển chuyển trong cách đặt câu. Nói thế cũng có nghĩa là nói rằng: tiếng Việt có<br>đầy đủ khả năng để diễn đạt tình cảm, tư tưởng của người Việt Nam và thỏa mãn cho yêu cầu của đời sống văn<br>hóa nước nhà qua các thời kì lịch sử”. (Theo Đặng Thai Mai)<br>\tA. Tiếng Việt có những đặc sắc của một thứ tiếng đẹp, một thứ tiếng hay<br>\tB. Nói thế có nghĩa là nói rằng: tiếng Việt là một thứ tiếng hài hòa về mặt âm hưởng, thanh điệu mà cũng rất<br>tế nhị, uyển chuyển trong cách đặt câu<br>\tC. Nói thế cũng có nghĩa là nói rằng: tiếng Việt có đầy đủ khả năng để diễn đạt tình cảm, tư tưởng của người<br>Việt Nam và thỏa mãn cho yêu cầu của đời sống văn hóa nước nhà qua các thời kì lịch sử<br>\tD. Không có câu văn mang luận điểm.<br>Phương pháp giải: Căn cứ đặc điểm văn bản nghị luận.<br>Giải chi tiết: “Tiếng Việt có những đặc sắc của một thứ tiếng đẹp, một thứ tiếng hay” là câu văn mang luận điểm, khái quát nội dung chính mà tác giả sẽ triển khai sau đó.","hint":""},{"originalNum":14,"qType":"1","qText":"Câu 14 (NB): “Mỗi chiếc lá rụng là một cái biểu hiện cho một cảnh biệt li. Vậy thì sự biệt li không chỉ có một<br>nghĩa buồn rầu, khổ sở. Sao ta không ngắm sự biệt li theo tâm hồn một chiếc lá nhẹ nhàng rơi?” (Theo Khái<br>Hưng). Câu nghi vấn trong đoạn trên dùng để làm gì?","context":"","image":null,"options":{"A":"Để hỏi.","B":"Để cầu khiến.","C":"Để bộc lộ cảm xúc.","D":"Để khẳng định."},"correct":"B","explanation":"(NB): “Mỗi chiếc lá rụng là một cái biểu hiện cho một cảnh biệt li. Vậy thì sự biệt li không chỉ có một<br>nghĩa buồn rầu, khổ sở. Sao ta không ngắm sự biệt li theo tâm hồn một chiếc lá nhẹ nhàng rơi?” (Theo Khái<br>Hưng). Câu nghi vấn trong đoạn trên dùng để làm gì?<br>\tA. Để hỏi.\tB. Để cầu khiến. \tC. Để bộc lộ cảm xúc. \tD. Để khẳng định. <br>Phương pháp giải: Căn cứ bài Câu nghi vấn<br>Giải chi tiết: - Câu nghi vấn ngoài chức năng để hỏi còn được sử dụng với một số chức năng khác như để khẳng định, phủ định, cầu khiến, đe dọa, bộc lộ cảm xúc,…<br>- Câu nghi vấn trong đoạn văn trên được dùng để cầu khiến.","hint":""},{"originalNum":15,"qType":"1","qText":"Câu 15 (NB): Trong các câu sau:<br>I. Bản Tuyên ngôn Nhân quyền và Dân quyền của Cách mạng Pháp năm 1790 cũng nói: “Người ta sinh ra tự do và bình đẳng về quyền lợi, và phải luôn luôn được tự do và bình đẳng về quyền lợi”.<br>II. Ông họa sĩ già mấp máy bộ ria mép, đăm chiêu nhìn bức tranh treo trên tường<br>III. Các từ in-tơ-net, tráng sĩ, ga-ra đều là từ mượn.<br>IV. “con, viên, thúng, tạ, nhà” là các danh từ chỉ đơn vị.<br>Những câu nào mắc lỗi:","context":"","image":null,"options":{"A":"I và II","B":"I, III và IV","C":"III và IV","D":"I và IV"},"correct":"D","explanation":"(NB): Trong các câu sau:<br>I. Bản Tuyên ngôn Nhân quyền và Dân quyền của Cách mạng Pháp năm 1790 cũng nói: “Người ta sinh ra tự do và bình đẳng về quyền lợi, và phải luôn luôn được tự do và bình đẳng về quyền lợi”.<br>II. Ông họa sĩ già mấp máy bộ ria mép, đăm chiêu nhìn bức tranh treo trên tường<br>III. Các từ in-tơ-net, tráng sĩ, ga-ra đều là từ mượn.<br>IV. “con, viên, thúng, tạ, nhà” là các danh từ chỉ đơn vị.<br>Những câu nào mắc lỗi:<br> \tA. I và II \tB. I, III và IV \tC. III và IV \tD. I và IV <br>Phương pháp giải: Căn cứ bài Tuyên ngôn độc lập, Danh từ<br>Giải chi tiết: Bản Tuyên ngôn Nhân quyền và Dân quyền của Cách mạng Pháp năm 1790 cũng nói: “Người ta sinh ra tự do và bình đẳng về quyền lợi, và phải luôn luôn được tự do và bình đẳng về quyền lợi”.<br>=> Sai năm ra đời bản tuyên ngôn, năm đúng là 1791.<br>“con, viên, thúng, tạ, nhà” là các danh từ chỉ đơn vị.<br>=> Các từ “con, viên, thúng, tạ” là danh từ chỉ đơn vị, nhưng “nhà” là danh từ chỉ sự vật.<br>Đọc đoạn trích sau và thực hiện các câu hỏi từ","hint":""},{"originalNum":16,"qType":"1","qText":"Câu 16 (NB): Phương thức biểu đạt chính của đoạn trích trên là:","context":"Đọc đoạn trích sau và thực hiện các câu hỏi từ câu 16 đến câu 20: <br>“Chưa chữ viết đã vẹn tròn tiếng nói<br>Vầng trăng cao đêm cá lặn sao mờ<br>Ôi tiếng Việt như đất cày, như lụa<br>Óng tre ngà và mềm mại như tơ<br><br>Tiếng tha thiết nói thường nghe như hát<br>Kể mọi điều bằng ríu rít âm thanh<br>Như gió nước không thể nào nắm bắt<br>Dấu huyền trầm, dấu ngã chênh vênh”<br>(trích “Tiếng Việt”- Lưu Quang Vũ)<br><br>","image":null,"options":{"A":"Nghị luận","B":"Tự sự","C":"Miêu tả","D":"Biểu cảm"},"correct":"D","explanation":"(NB): Phương thức biểu đạt chính của đoạn trích trên là:<br>\tA. Nghị luận \tB. Tự sự \tC. Miêu tả \tD. Biểu cảm <br>Phương pháp giải: Căn cứ vào các phương thức biểu đạt đã học<br>Giải chi tiết: - Phương thức biểu đạt: biểu cảm.","hint":""},{"originalNum":17,"qType":"1","qText":"Câu 17 (NB): Văn bản trên thuộc thể thơ nào?","context":"","image":null,"options":{"A":"Tự do","B":"Bảy chữ","C":"Tám chữ","D":"Lục bát"},"correct":"A","explanation":"(NB): Văn bản trên thuộc thể thơ nào? <br>\tA. Tự do\tB. Bảy chữ \tC. Tám chữ \tD. Lục bát <br>Phương pháp giải: Căn cứ vào các thể thơ đã học<br>Giải chi tiết: - Thể thơ tự do:<br>+ số tiếng trong một câu không hạn chế<br>+ số câu trong một khổ không hạn chế<br>+ không có niêm, luật,..","hint":""},{"originalNum":18,"qType":"1","qText":"Câu 18 (NB): Đoạn trích sử dụng bao nhiêu câu so sánh?","context":"","image":null,"options":{"A":"Một câu","B":"Hai câu","C":"Ba câu","D":"Bốn câu"},"correct":"D","explanation":"(NB): Đoạn trích sử dụng bao nhiêu câu so sánh?<br>\tA. Một câu \tB. Hai câu\tC. Ba câu \tD. Bốn câu <br>Phương pháp giải: Dựa vào bài so sánh<br>Giải chi tiết: Các câu so sánh trong đoạn trích:<br>+ Ôi tiếng Việt như đất cày, như lụa <br>+ Óng tre ngà và mềm mại như tơ <br>+ Tiếng tha thiết nói thường nghe như hát <br>+ Như gió nước không thể nào nắm bắt","hint":""},{"originalNum":19,"qType":"1","qText":"Câu 19: Tiếng Việt được cảm nhận trên những phương diện nào?","context":"","image":null,"options":{"A":"Hình","B":"Thanh","C":"Hình và thanh","D":"Âm và điệu"},"correct":"C","explanation":"Tiếng Việt được cảm nhận trên những phương diện nào?<br>\tA. Hình \tB. Thanh \tC. Hình và thanh \tD. Âm và điệu <br>Phương pháp giải: đọc, tìm ý<br>Giải chi tiết: - Bằng các biện pháp so sánh, liên tưởng đầy thú vị, tác giả đã hữu hình hóa vẻ đẹp của tiếng Việt bằng các hình ảnh, âm thanh cụ thể. Từ đó làm nổi bật vẻ đẹp của tiếng Việt ở cả hai phương diện hình và thanh.","hint":""},{"originalNum":20,"qType":"1","qText":"Câu 20: Nội dung chính của đoạn trích trên là gì?","context":"","image":null,"options":{"A":"Hữu hình hóa vẻ đẹp của tiếng Việt bằng các hình ảnh, âm thanh cụ thể.","B":"Tình cảm yêu mến, trân trọng và tự hào của tác giả dành cho vẻ đẹp và sự giàu có, phong phú của tiếng<br>Việt.","C":"Ca ngợi sự giàu có, phong phú của tiếng Việt.","D":"Tình yêu tiếng mẹ đẻ làm cơ sở cho tình yêu quê hương, đất nước."},"correct":"B","explanation":"Nội dung chính của đoạn trích trên là gì?<br>\tA. Hữu hình hóa vẻ đẹp của tiếng Việt bằng các hình ảnh, âm thanh cụ thể. <br>\tB. ình cảm yêu mến, trân trọng và tự hào của tác giả dành cho vẻ đẹp và sự giàu có, phong phú của tiếng<br>Việt.<br> \tC. Ca ngợi sự giàu có, phong phú của tiếng Việt. <br>\tD. Tình yêu tiếng mẹ đẻ làm cơ sở cho tình yêu quê hương, đất nước. <br>Phương pháp giải: phân tích, tổng hợp<br>Giải chi tiết: - Đoạn trích đã thể hiện tình cảm yêu mến, trân trọng và tự hào của tác giả dành cho vẻ đẹp và sự giàu có, phong phú của tiếng Việt.","hint":""}]}];
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyKTElQukk21DQRGAXuUcxyEePPnVeZlY0qmwvK-NdnGS47vIBcELK2eM5_9rp-V5eo-A/exec";
+        
+        // Nhúng dữ liệu đã mã hóa từ Generator vào file
+        const ENCRYPTED_USERS = "JTVCJTdCJTIyaWQlMjIlM0ElMjJodW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIySCVDMyVCOW5nJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuaHUlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIdSVFMSVCQiVCM25oJTIwTmglQzYlQjAlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnF1eW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUXUlRTElQkIlQjNuaCUyMEwlQzMlQUElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgxJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyME5ndXklRTElQkIlODVuJTIwRHUlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm5nb2MxJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwTmd1eSVFMSVCQiU4NW4lMjBEdSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydnklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJNYWklMjBWeSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmd1eWV0YW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmd1eSVFMSVCQiU4N3QlMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtoYW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQiVFMSVCQSVBM28lMjBLaGFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaG9haWFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwaSUyMEFuaCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyZ2lhbmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIJUM2JUIwJUM2JUExbmclMjBHaWFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdvYzIlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOZyVFMSVCQiU4RGMlMjBFYWthciUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGhhb2FuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRoJUUxJUJBJUEzbyUyMEFuaCUyMEVha2FyJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJsdXUlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJMJUM2JUIwdSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdvY2hhJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwSCVDMyVBMCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmdhbjElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIbyVDMyVBMG5nJTIwTmclQzMlQTJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ2FuMiUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglQzMlQTAlMjBOZyVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgyJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyMEdpYSUyME5naCVDNCVBOWElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxpbmgzJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTGluaCUyMEhDTSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybWFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyVHJpJUUxJUJCJTg3dSUyME0lRTElQkElQUJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJkdW5nJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUGglQzMlQkElMjBEJUM1JUE5bmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmR1eWVuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTSVFMSVCQiVCOSUyMER1eSVDMyVBQW4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmxhbSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkIlOTNuZyUyMEwlQzMlQTJtJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0YW0lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUciVFMSVCQSVBN24lMjBUJUMzJUEybSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmh1bmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVFMSVCQSVBMW0lMjBOaHVuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyYW4lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJBbiUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJpJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmd1eSVFMSVCQiU4NW4lMjBWaSVFMSVCQSVCRnQlMjBUciVDMyVBRCUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydmklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUcmklRTElQkIlODd1JTIwVmklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnRpbmglMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUJUUxJUJCJUFCJTIwSCVFMSVCQiVBRnUlMjBUJUUxJUJCJTg5bmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyaSVFMSVCQiU4N3UlMjAlQzMlODJuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0aGFuZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyJUUxJUJBJUE3biUyMCVDNCU5MGluaCUyMEMlQzMlQjRuZyUyMFRoJUUxJUJBJUFGbmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtpZXQlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjIlQzQlOTBvJUMzJUEwbiUyMFQlRTElQkElQTVuJTIwS2klRTElQkIlODd0JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJhdSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkElQTNpJTIwJUMzJTgydSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIycXVhbiUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMk1pbmglMjBRdSVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmJhbyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMiVDNCU5MCVFMSVCQiVBOWMlMjBCJUUxJUJBJUEzbyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJhbmclMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUaHUlMjBUcmFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydHJpMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMlRoYW5oJTIwVHIlQzMlQUQlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnRoYW8lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVDNiVCMCVDNiVBMW5nJTIwVGglRTElQkElQTNvJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJkdW9uZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMk5oJUUxJUJBJUFEdCUyMEQlQzYlQjAlQzYlQTFuZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaHVuZzElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMzQ1NiUyMiUyQyUyMm5hbWUlMjIlM0ElMjJIJUMzJUI5bmclMjBQaG9uZyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIybmh1MSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkdpYSUyME5odSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIycGh1b25nYW5oJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUM2JUIwJUM2JUExbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnV5ZW4lMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjElMjIlMkMlMjJuYW1lJTIyJTNBJTIyVXklQzMlQUFuJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJob2FuZyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmtoYW5nMSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzNDU2JTIyJTJDJTIybmFtZSUyMiUzQSUyMktoYW5nJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJraG9pJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjM0NTYlMjIlMkMlMjJuYW1lJTIyJTNBJTIyS2glQzMlQjRpJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJ0cmlldSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkwlQzMlQUElMjBRdSVFMSVCQiU5MWMlMjBUcmklRTElQkIlODd1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJodXklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJUciVFMSVCQSVBN24lMjBIdXklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm1pbmglMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOaCVFMSVCQSVBRHQlMjBNaW5oJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJjaGF1JTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQ2glQzMlQTJ1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ2ElMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJOZ2ElMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmRhaSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlRyJUUxJUJCJThEbmclMjAlQzQlOTAlRTElQkElQTFpJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJodXklMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJHaWElMjBIdXklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmR1YyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMk1pbmglMjAlQzQlOTAlRTElQkIlQTljJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJxdXluaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMk5ndXklRTElQkIlODVuJTIwTmglQzYlQjAlMjBRdSVFMSVCQiVCM25oJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJuZ29jJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIySCVDMyVBMCUyMEglRTElQkElQTNpJTIwTmclRTElQkIlOERjJTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJueW55JTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyQyVDMyVBMXAlMjBOZ3V5JUUxJUJCJTg1biUyME55JTIwTnklMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmFuaCUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkhvJUMzJUEwbmclMjBUaCVFMSVCQiU4QiUyMFBoJUM2JUIwJUM2JUExbmclMjBBbmglMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMm5odTIlMjIlMkMlMjJwYXNzd29yZCUyMiUzQSUyMjEyMyUyMiUyQyUyMm5hbWUlMjIlM0ElMjJQaCVFMSVCQSVBMW0lMjBMb25nJTIwR2lhJTIwTmglQzYlQjAlMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMnBoaSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUUxJUJBJUExbSUyME5nJUUxJUJCJThEYyUyMFBoaSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGFpJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyUGglRTElQkElQTFtJTIwViVDNCU4M24lMjBUJUMzJUEwaSUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIydGhhbyUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMlBoJUUxJUJBJUExbSUyMFRoJUUxJUJBJUEzbyUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaGFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTmclRTElQkIlOERjJTIwSCVDMyVBMm4lMjIlN0QlMkMlN0IlMjJpZCUyMiUzQSUyMmhhdSUyMiUyQyUyMnBhc3N3b3JkJTIyJTNBJTIyMTIzJTIyJTJDJTIybmFtZSUyMiUzQSUyMkglRTElQkElQUR1JTIyJTdEJTJDJTdCJTIyaWQlMjIlM0ElMjJxdWFuJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyTWluaCUyMFF1JUMzJUEybiUyMiU3RCUyQyU3QiUyMmlkJTIyJTNBJTIyaG9hJTIyJTJDJTIycGFzc3dvcmQlMjIlM0ElMjIxMjMlMjIlMkMlMjJuYW1lJTIyJTNBJTIyVHIlRTElQkElQTduJTIwSG9hJTIyJTdEJTVE"; 
+        
+        let currentStudent = { id: "", name: "" };
+        let sectionStartTimes = {};
+
+        async function handleLogin() {
+            const id = document.getElementById('hs-id').value.trim();
+            const pass = document.getElementById('hs-pass').value.trim();
+            const msg = document.getElementById('login-msg');
+            
+            if(!id || !pass) return msg.innerText = "Nhập đủ ID và Mật khẩu!";
+            
+            try {
+                if(!ENCRYPTED_USERS) {
+                    msg.innerText = "Lỗi: Bài thi chưa được nhúng dữ liệu học sinh (Chưa tải từ Generator)!";
+                    return;
+                }
+                
+                // Giải mã danh sách học sinh
+                const users = JSON.parse(decodeURIComponent(atob(ENCRYPTED_USERS)));
+                
+                // Tìm kiếm thông tin học sinh ở môi trường cục bộ (so sánh id và pass)
+                const user = users.find(u => u.id == id && u.password == pass); // Đổi 'password' thành key phù hợp với Sheet của bạn
+                
+                if(user) {
+                    currentStudent.id = id; 
+                    currentStudent.name = user.name;
+                    document.getElementById('login-modal').style.display = 'none';
+                    
+                    // --- THÊM PHẦN HỎI VÀ HIỂN THỊ TÊN Ở ĐÂY ---
+                    // Hỏi xác nhận họ tên (Gợi ý sẵn tên lấy từ GG Sheet)
+                    const confirmedName = prompt("Vui lòng xác nhận Họ Tên của bạn để hiển thị trên bài làm:", currentStudent.name) || currentStudent.name;
+                    currentStudent.name = confirmedName; // Cập nhật lại nếu hs sửa
+                    
+                    // Hiển thị tên với viền RGB và Nút tải
+                    document.getElementById('student-name-display').innerHTML = "Học sinh: " + currentStudent.name + " - ID: " + currentStudent.id;
+                    document.getElementById('student-info-container').style.display = 'block';
+                    document.getElementById('btn-download-html').style.display = 'block';
+                    // -------------------------------------------
+
+                    quizData.forEach((sec, sIdx) => sectionStartTimes[sIdx] = Date.now());
+                    startHeartbeat(id);
+                } else { 
+                    msg.innerText = "Sai Mã học sinh hoặc Mật khẩu!"; 
+                }
+            } catch(e) { 
+                msg.innerText = "Lỗi hệ thống khi đăng nhập!"; 
+            }
+        }
+		
+		// ==========================================
+        // HỆ THỐNG TRACKING & CHỐNG GIAN LẬN
+        // ==========================================
+        function startHeartbeat(studentId) {
+            setInterval(function() {
+                const formData = new URLSearchParams();
+                formData.append('action', 'ping');
+                formData.append('id', studentId);
+                formData.append('status', getRealStatus()); 
+                fetch(GAS_URL, { method: "POST", body: formData })
+                .catch(err => console.log("Lỗi ping:", err));
+            }, 60000); 
+        }
+
+        window.addEventListener('beforeunload', function () {
+            if (typeof currentStudent !== 'undefined' && currentStudent.id) {
+                const formData = new FormData();
+                formData.append('action', 'ping');
+                formData.append('id', currentStudent.id);
+                formData.append('status', 'Mất kết nối (Thoát trang)');
+                navigator.sendBeacon(GAS_URL, formData);
+            }
+        });
+
+        function getRealStatus() {
+            // Tinh chỉnh riêng cho trang Toán 12: Kiểm tra trạng thái các nút nộp bài
+            const submitBtns = document.querySelectorAll('.btn-submit-section');
+            if (submitBtns.length === 0) return "Đang làm bài";
+            
+            let allSubmitted = true;
+            let submittedCount = 0;
+            
+            submitBtns.forEach(btn => {
+                if (btn.innerText !== "ĐÃ LƯU ĐIỂM") {
+                    allSubmitted = false;
+                } else {
+                    submittedCount++;
+                }
+            });
+
+            if (allSubmitted) return "Đã nộp xong tất cả (Đang xem giải thích)";
+            if (submittedCount > 0) return `Đã nộp ${submittedCount}/${submitBtns.length} chuyên đề`;
+            
+            return "Đang làm bài";
+        }
+
+        let tabSwitchTimeout;
+        let hasSentTabSwitchSignal = false; 
+
+        document.addEventListener("visibilitychange", function() {
+            if (typeof currentStudent !== 'undefined' && currentStudent.id) {
+                if (document.hidden) {
+                    tabSwitchTimeout = setTimeout(function() {
+                        hasSentTabSwitchSignal = true; 
+                        const formData = new FormData();
+                        formData.append('action', 'ping');
+                        formData.append('id', currentStudent.id);
+                        formData.append('status', '⚠️ ĐANG LƯỚT TAB KHÁC (Quá 1 phút)!');
+                        navigator.sendBeacon(GAS_URL, formData);
+                    }, 60000); 
+                } else {
+                    clearTimeout(tabSwitchTimeout);
+                    if (hasSentTabSwitchSignal) {
+                        let currentStatus = getRealStatus();
+                        const formData = new FormData();
+                        formData.append('action', 'ping');
+                        formData.append('id', currentStudent.id);
+                        formData.append('status', currentStatus);
+                        navigator.sendBeacon(GAS_URL, formData);
+                        hasSentTabSwitchSignal = false; 
+                    }
+                }
+            }
+        });
+
+        async function sendReportToSheet(score, total, timeSpent, testName, submitBtn) {
+            submitBtn.innerText = "ĐANG GỬI DỮ LIỆU..."; submitBtn.disabled = true;
+            const formData = new URLSearchParams();
+            formData.append('action', 'submitReport'); formData.append('id', currentStudent.id);
+            formData.append('name', currentStudent.name); formData.append('testName', testName);
+            formData.append('score', score + "/" + total); formData.append('time', timeSpent + " giây");
+            formData.append('details', "Đã nộp bài"); formData.append('note', 'Toán');
+
+            try {
+                await fetch(GAS_URL, { method: 'POST', body: formData });
+                alert(`Lưu điểm phần "${testName}" thành công! (${score}/${total})`);
+                submitBtn.innerText = "ĐÃ LƯU ĐIỂM"; submitBtn.style.background = "#27ae60";
+            } catch(e) {
+                alert("Lỗi khi gửi kết quả! Hãy chụp màn hình lại.");
+                submitBtn.innerText = "LỖI - THỬ LẠI"; submitBtn.disabled = false;
+            }
+        }
+
+        window.submitSection = function(sIdx, btnId) {
+            const btn = document.getElementById(btnId);
+            const sec = quizData[sIdx];
+            let score = 0, totalItems = 0;
+            
+            sec.questions.forEach((q, qIdx) => {
+                const id = sIdx + '_' + qIdx;
+                if (q.qType === "1") {
+                    totalItems++;
+                    const selected = document.querySelector(`input[name="q${id}"]:checked`);
+                    if(selected && selected.value === q.correct) score++;
+                } else if (q.qType === "2") {
+                    totalItems += 4;
+                    ['A','B','C','D'].forEach(opt => {
+                        const selected = document.querySelector(`input[name="q${id}_${opt}"]:checked`);
+                        if(selected && selected.value === q.correct[opt]) score++;
+                    });
+                } else if (q.qType === "3") {
+                    totalItems++;
+                    const input = document.getElementById(`q${id}_sa`);
+                    if(input) {
+                        const userAns = input.value.trim().toLowerCase();
+                        const correctVals = q.correct.split(';').map(v => v.trim().toLowerCase());
+                        if (correctVals.includes(userAns)) score++;
+                    }
+                }
+            });
+            
+            let timeSpent = sectionStartTimes[sIdx] ? Math.floor((Date.now() - sectionStartTimes[sIdx]) / 1000) : 0;
+            sendReportToSheet(score, totalItems, timeSpent, sec.title, btn);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            let html = "";
+
+            quizData.forEach((sec, sIdx) => {
+                html += `<h2 class="section-header">${sec.title}</h2>`;
+                sec.questions.forEach((q, qIdx) => {
+                    const id = sIdx + '_' + qIdx;
+                    
+                    // Chỉ giữ lại icon bóng đèn, đổi hàm onclick thành showHintModal và truyền sIdx, qIdx
+                    let hintIcon = q.hint ? `<span class="hint-icon" onclick="showHintModal(${sIdx}, ${qIdx})" title="Click để xem gợi ý">💡</span>` : '';
+
+                    // Khung hiển thị Đoạn trích / Ngữ liệu cho Học sinh
+                    if (q.context) {
+                        html += `<div class="passage-box" style="background:#e8f4f8; padding:20px; border-left:5px solid #2980b9; margin-bottom:20px; border-radius:6px; font-size:16.5px; line-height:1.8; box-shadow:0 2px 4px rgba(0,0,0,0.05); font-family:serif;">
+                            ${q.context}
+                        </div>`;
+                    }
+					
+					html += `<div class="question-box" id="qBox_${id}">
+                                <div class="q-text">
+                                    ${q.qText}
+                                    ${hintIcon}
+                                </div>`;
+                                
+                    if (q.image) html += `<img src="${q.image}" style="max-width:100%; border-radius:4px; margin-bottom:15px;">`;
+                    
+                    // Nâng cấp HTML Type 1 & 2 với class mới
+                    if (q.qType === "1") {
+                        html += `<div class="options-grid">
+                            <label class="option-label" id="lbl_${id}_A"><input type="radio" name="q${id}" value="A"><span class="opt-letter">A</span> ${q.options.A}</label>
+                            <label class="option-label" id="lbl_${id}_B"><input type="radio" name="q${id}" value="B"><span class="opt-letter">B</span> ${q.options.B}</label>
+                            <label class="option-label" id="lbl_${id}_C"><input type="radio" name="q${id}" value="C"><span class="opt-letter">C</span> ${q.options.C}</label>
+                            <label class="option-label" id="lbl_${id}_D"><input type="radio" name="q${id}" value="D"><span class="opt-letter">D</span> ${q.options.D}</label>
+                        </div>`;
+                    } else if (q.qType === "2") {
+                        html += `<table class="tf-table">
+                            <tr><th>Mệnh đề</th><th width="80px">Đúng</th><th width="80px">Sai</th></tr>
+                            ${['A','B','C','D'].map(opt => `
+                            <tr>
+                                <td><span class="opt-letter-tf">${opt}</span> ${q.options[opt]}</td>
+                                <td class="tf-cell-center" id="td_${id}_${opt}_D">
+                                    <label class="tf-radio-label"><input type="radio" name="q${id}_${opt}" value="Đ"><span class="tf-btn">Đ</span></label>
+                                </td>
+                                <td class="tf-cell-center" id="td_${id}_${opt}_S">
+                                    <label class="tf-radio-label"><input type="radio" name="q${id}_${opt}" value="S"><span class="tf-btn">S</span></label>
+                                </td>
+                            </tr>`).join('')}
+                        </table>`;
+                    } else if (q.qType === "3") {
+						html += `<div>
+							<input type="text" id="q${id}_sa" class="sa-input" placeholder="Nhập hoặc tick chọn đáp án..." style="font-size:20px; font-weight:bold; margin-bottom:15px; text-align:center;">
+							<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width: 400px; margin: 0 auto;">
+								${['1','2','3','4','5','6','7','8','9','0','-',',','.'].map(char => 
+									`<button type="button" style="width:45px; height:45px; border-radius:50%; background:#fff; border:2px solid #bdc3c7; font-size:18px; font-weight:bold; color:#2c3e50; cursor:pointer;" onmouseover="this.style.background='#ecf0f1'" onmouseout="this.style.background='#fff'" onclick="document.getElementById('q${id}_sa').value += '${char}'">${char}</button>`
+								).join('')}
+								<button type="button" style="height:45px; padding:0 20px; border-radius:25px; background:#e74c3c; border:none; font-size:16px; font-weight:bold; color:white; cursor:pointer;" onclick="let input = document.getElementById('q${id}_sa'); input.value = input.value.slice(0, -1);">Xóa</button>
+							</div>
+						</div>`;
+					}
+
+                    html += `<div class="actions">
+                                <button class="btn-check" onclick="checkAnswer(${sIdx}, ${qIdx})">Kiểm tra ngay</button>
+                                <button class="btn-key" id="btnKey_${id}" onclick="showKey(${sIdx}, ${qIdx})">Xem Lời Giải</button>
+                            </div>
+                            <div class="feedback" id="feedback_${id}"></div>
+                            <div class="explanation-box" id="exp_${id}">${q.explanation}</div>
+                        </div>`;
+                });
+                const btnId = 'submitBtn_' + sIdx;
+                html += `<button id="${btnId}" class="btn-submit-section" onclick="submitSection(${sIdx}, '${btnId}')">NỘP BÀI & LƯU ĐIỂM CHUYÊN ĐỀ NÀY</button><hr style="margin-top:40px;">`;
+            });
+            container.innerHTML = html;
+        }
+		
+		window.showHintModal = function(sIdx, qIdx) {
+            const q = quizData[sIdx].questions[qIdx];
+            if (!q || !q.hint) return;
+            
+            const modalBody = document.getElementById('hint-modal-body');
+            // Chuyển đổi dấu xuống dòng
+            modalBody.innerHTML = q.hint.replace(/\n/g, '<br>');
+            
+            // Hiển thị pop-up
+            document.getElementById('hint-modal-overlay').style.display = 'flex';
+            
+            // Yêu cầu MathJax render lại công thức Toán trong pop-up
+            if (window.MathJax) {
+                MathJax.typesetPromise([modalBody]);
+            }
+        };
+
+        window.closeHintModal = function() {
+            document.getElementById('hint-modal-overlay').style.display = 'none';
+        };
+
+        window.checkAnswer = function(sIdx, qIdx) {
+            const id = sIdx + '_' + qIdx;
+            const q = quizData[sIdx].questions[qIdx];
+            const feedback = document.getElementById(`feedback_${id}`);
+            document.getElementById(`btnKey_${id}`).style.display = 'inline-block';
+            let isAllCorrect = true;
+
+            if (q.qType === "1") {
+                const selected = document.querySelector(`input[name="q${id}"]:checked`);
+                ['A', 'B', 'C', 'D'].forEach(opt => document.getElementById(`lbl_${id}_${opt}`).className = 'option-label');
+                if (!selected) { isAllCorrect = false; } 
+                else if (selected.value === q.correct) { document.getElementById(`lbl_${id}_${selected.value}`).classList.add('correct'); } 
+                else { document.getElementById(`lbl_${id}_${selected.value}`).classList.add('wrong'); isAllCorrect = false; }
+            } 
+            else if (q.qType === "2") {
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    const selected = document.querySelector(`input[name="q${id}_${opt}"]:checked`);
+                    const tdD = document.getElementById(`td_${id}_${opt}_D`);
+                    const tdS = document.getElementById(`td_${id}_${opt}_S`);
+                    tdD.className = 'tf-cell-center'; tdS.className = 'tf-cell-center';
+                    
+                    if (!selected) { isAllCorrect = false; }
+                    else if (selected.value === q.correct[opt]) {
+                        if(selected.value === 'Đ') tdD.classList.add('tf-correct'); else tdS.classList.add('tf-correct');
+                    } else {
+                        if(selected.value === 'Đ') tdD.classList.add('tf-wrong'); else tdS.classList.add('tf-wrong');
+                        isAllCorrect = false;
+                    }
+                });
+            }
+            else if (q.qType === "3") {
+                const input = document.getElementById(`q${id}_sa`);
+                const userAns = input.value.trim().toLowerCase();
+                const correctVals = q.correct.split(';').map(v => v.trim().toLowerCase());
+                if (!userAns) isAllCorrect = false;
+                else if (correctVals.includes(userAns)) { input.style.borderColor = '#2ecc71'; input.style.backgroundColor = '#d5f5e3'; }
+                else { input.style.borderColor = '#e74c3c'; input.style.backgroundColor = '#fadbd8'; isAllCorrect = false; }
+            }
+
+            feedback.innerHTML = isAllCorrect ? '<span style="color:#2ecc71">Xuất sắc! Bạn chọn đúng hết! 🎉</span>' : '<span style="color:#e74c3c">Có chỗ sai sót, hãy kiểm tra lại.</span>';
+        };
+
+        window.showKey = function(sIdx, qIdx) {
+            const id = sIdx + '_' + qIdx;
+            const q = quizData[sIdx].questions[qIdx];
+            const exp = document.getElementById(`exp_${id}`);
+            
+            let correctText = "";
+            if(q.qType === "1") correctText = `<strong>Đáp án đúng: ${q.correct}</strong><br><br>`;
+            else if(q.qType === "2") correctText = `<strong>Key: A-${q.correct.A} | B-${q.correct.B} | C-${q.correct.C} | D-${q.correct.D}</strong><br><br>`;
+            else if(q.qType === "3") correctText = `<strong>Đáp án được chấp nhận: ${q.correct}</strong><br><br>`;
+
+            exp.innerHTML = correctText + q.explanation;
+            exp.style.display = 'block';
+            if (window.MathJax) MathJax.typesetPromise([exp]);
+        };
+		
+		// ==========================================
+        // HÀM LƯU BÀI LÀM ĐÃ CHẤM THÀNH FILE HTML
+        // ==========================================
+        window.downloadGradedHTML = function() {
+            const btnDownload = document.getElementById('btn-download-html');
+            btnDownload.innerText = "ĐANG TẠO FILE...";
+            
+            // 1. Đồng bộ trạng thái giao diện vào HTML Attributes để giữ nguyên thao tác
+            document.querySelectorAll('input[type="radio"]').forEach(el => {
+                if (el.checked) el.setAttribute('checked', 'checked');
+                else el.removeAttribute('checked');
+            });
+            document.querySelectorAll('input[type="text"]').forEach(el => {
+                el.setAttribute('value', el.value);
+            });
+
+            // 2. Clone toàn bộ mã nguồn hiện tại của trang
+            const clone = document.documentElement.cloneNode(true);
+
+            // 3. Xóa các thành phần không cần thiết ở bản offline
+            const elementsToRemove = ['#login-modal', '#btn-download-html', '.btn-submit-section', '.btn-check'];
+            elementsToRemove.forEach(selector => {
+                clone.querySelectorAll(selector).forEach(el => el.remove());
+            });
+
+            // 4. Khóa toàn bộ input và button (NHƯNG giữ lại nút Xem Lời Giải)
+            clone.querySelectorAll('input, button:not(.btn-key)').forEach(el => el.setAttribute('disabled', 'true'));
+
+            // 5. XỬ LÝ LỖI "RENDER LẠI TỪ ĐẦU" (Dùng replace chuỗi để an toàn tuyệt đối, tránh lỗi regex)
+            clone.querySelectorAll('script').forEach(script => {
+                let code = script.innerHTML;
+                code = code.replace('function renderQuiz() {', 'function renderQuiz() { return; /* Đã chặn render offline */ ');
+                code = code.replace('startHeartbeat(id);', '/* Bản offline: Đã chặn heartbeat */');
+                script.innerHTML = code;
+            });
+
+            // 6. Tạo file và ép trình duyệt tải xuống (Đã xóa ký tự xuống dòng)
+            const htmlContent = "<!DOCTYPE html>" + clone.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Tên file xuất ra chứa toàn bộ bài làm
+            const safeName = currentStudent.name ? currentStudent.name.replace(/\s+/g, '_') : 'Khach';
+            const safeId = currentStudent.id ? currentStudent.id : 'Unknown';
+            a.download = `BaiLam_${safeName}_${safeId}.html`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            btnDownload.innerText = "📥 TẢI BÀI ĐÃ CHẤM";
+        };
+
+        renderQuiz();
+    </script>
+</body>
+</html>
